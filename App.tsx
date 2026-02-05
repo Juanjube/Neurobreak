@@ -7,6 +7,7 @@ import MovementEngine from './components/MovementEngine';
 import Ritual from './components/Ritual';
 import Insights from './components/Insights';
 import ProfileSettings from './components/ProfileSettings';
+import AIChatButton from './components/AIChatButton';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
@@ -224,6 +225,7 @@ const App: React.FC = () => {
           )}
         </main>
       </div>
+      {user && <AIChatButton t={t} lang={user.language} />}
     </div>
   );
 };

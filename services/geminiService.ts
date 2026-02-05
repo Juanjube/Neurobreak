@@ -65,15 +65,26 @@ export class AIService {
   }
 
   generateSynergyTip = async (lang: string = 'en') => {
-    const prompt = `Give one unique nutritional synergy for brain health. Respond in ${lang === 'es' ? 'Spanish' : 'English'}. Return ONLY raw JSON with keys: title, subtitle, description, icon.`;
+    const prompt = `Give one unique nutritional synergy for brain health. Respond in ${lang === 'es' ? 'Spanish' : 'English'}. Return ONLY raw JSON with keys: title, subtitle, description, icon. 
+    - "icon": MUST be a single Material Design icon name (e.g., 'bolt', 'spa', 'nutrition', 'water_drop').
+    - "subtitle": Short category (e.g., "Vitamin C + Iron"). NO URLs.`;
     
     const result = await this.askAI(prompt, true);
     if (!result) return null;
     try {
-        return JSON.parse(result);
+        const parsed = JSON.parse(result);
+        // Fallback for bad icons
+        if (parsed.icon && parsed.icon.length > 20) parsed.icon = 'star';
+        return parsed;
     } catch (e) {
         return null;
     }
+  }
+
+  chat = async (message: string, lang: string = 'en') => {
+    const prompt = `You are a helpful neuro-optimisation assistant. Answer the user's question about brain health, productivity, or wellness. Respond in ${lang === 'es' ? 'Spanish' : 'English'}. Keep it concise and helpful.\nUser: ${message}`;
+    const result = await this.askAI(prompt);
+    return result || (lang === 'es' ? "Lo siento, no puedo responder ahora." : "Sorry, I cannot answer right now.");
   }
 }
 
