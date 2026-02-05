@@ -46,9 +46,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     <div className="min-h-screen flex items-center justify-center bg-background-dark p-4">
       <div className="w-full max-w-md bg-card-dark border border-white/10 p-8 rounded-2xl shadow-2xl">
         <div className="flex flex-col items-center gap-4 mb-8">
-          <div className="size-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined text-4xl">psychology</span>
-          </div>
+            <img src="/Logo.jpg" alt="NeuroBreak Logo" className="size-full rounded-2xl object-cover" />
           <h1 className="text-3xl font-bold tracking-tight">NeuroBreak AI</h1>
           <p className="text-[#92adc9] text-sm text-center">Optimize your brain's performance with data-driven bio-hacks.</p>
         </div>

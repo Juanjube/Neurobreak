@@ -20,9 +20,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
           className="flex items-center gap-3 text-primary cursor-pointer"
           onClick={() => onNavigate(Page.DASHBOARD)}
         >
-          <div className="size-8 flex items-center justify-center">
-            <span className="material-symbols-outlined text-3xl">psychology</span>
-          </div>
+            <img src="/Logo.jpg" alt="Logo" className="size-10 rounded-full object-cover" />
           <h2 className="text-white text-xl font-bold leading-tight tracking-tight">NeuroBreak</h2>
         </div>
         <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">
