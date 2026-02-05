@@ -10,38 +10,95 @@ import ProfileSettings from './components/ProfileSettings';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
+import { supabase, getProfile, signOut } from './services/supabase';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.LOGIN);
   const [user, setUser] = useState<User | null>(null);
   const [activeMovement, setActiveMovement] = useState<Movement | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchProfile(session.user.id, session.user.email!);
+      } else {
+        setLoading(false);
+        setCurrentPage(Page.LOGIN);
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchProfile(session.user.id, session.user.email!);
+      } else {
+        setUser(null);
+        setCurrentPage(Page.LOGIN);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId: string, email: string) => {
+    try {
+      const { data, error } = await getProfile(userId);
+      
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      if (data) {
+        // Map DB profile to User object
+        const userData: User = {
+          name: data.full_name || 'Explorer',
+          email: email,
+          avatar: data.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8tVVenH4DAYEjgMcmJ3MhTfeSY7hLzxL3LH8vuuMQcXlK6UWw67D4PK06KVu6pjEAOdnthAhxmEstZY1xrmqeuFWfh_7tetgkURLbkZu6DoXIxztVqPmcJAxhRwI2CEKff6Zo78mLCSp_-Gmuwb-Sl-1n8gtW_pIQYXEFUripk-Qm_KWVDkSIue0_1GWTKVZPjEfKpAx0D2_LrFM8Wn-oo5KybVeuzSGTiy_1ogWLP9_blRY-6HjV4R-KgPKDIC8bdQ31orxbiTnH',
+          goal: data.goal || 'Deep Work',
+          language: (data.language as Language) || 'en',
+          progress: {
+            mentalClarity: data.mental_clarity || 3.2,
+            backHealth: data.back_health || 45,
+            sessionsCompleted: data.sessions_completed || 0
+          }
+        };
+        setUser(userData);
+        setCurrentPage(Page.DASHBOARD);
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching profile:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const t = (key: keyof typeof translations['en']) => {
     const lang = user?.language || 'en';
     return translations[lang][key] || key;
   };
 
+  // Deprecated: Auth component now handles login internally via Supabase, 
+  // and App listens to the state change. 
+  // Keeping this as a placeholder/type satisfier if needed for Auth component prop, 
+  // but Auth component doesn't strictly depend on it for logic anymore.
   const handleLogin = (userData: User) => {
-    setUser({ 
-      ...userData, 
-      language: 'en', 
-      goal: 'Deep Work',
-      progress: {
-        mentalClarity: 3.2,
-        backHealth: 45,
-        sessionsCompleted: 0
-      }
-    });
-    setCurrentPage(Page.DASHBOARD);
+     // This flow is replaced by onAuthStateChange
   };
 
   const handleUpdateUser = (updatedUser: User) => {
     setUser(updatedUser);
+    // TODO: Update Supabase profile here
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentPage(Page.LOGIN);
+  const handleLogout = async () => {
+    await signOut();
+    // onAuthStateChange will handle state updates
   };
 
   const handleSelectMovement = (m: Movement) => {
@@ -67,9 +124,14 @@ const App: React.FC = () => {
     
     setCurrentPage(Page.DASHBOARD);
     setActiveMovement(null);
+    // TODO: Persist session completion to DB
   };
 
-  if (currentPage === Page.LOGIN) {
+  if (loading) {
+     return <div className="min-h-screen bg-background-dark flex items-center justify-center text-white">Loading...</div>;
+  }
+
+  if (!user) {
     return <Auth onLogin={handleLogin} />;
   }
 
