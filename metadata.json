@@ -1,0 +1,8 @@
+{
+  "name": "NeuroBreak ",
+  "description": "A cutting-edge neuro-wellness dashboard for cognitive monitoring, strategic movement interventions, and data-driven brain vitality insights.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
