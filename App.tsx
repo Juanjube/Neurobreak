@@ -10,7 +10,7 @@ import ProfileSettings from './components/ProfileSettings';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
-import { supabase, getProfile, signOut } from './services/supabase';
+import { supabase, getProfile, signOut, updateProfile, logSession } from './services/supabase';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.LOGIN);
@@ -63,9 +63,9 @@ const App: React.FC = () => {
           goal: data.goal || 'Deep Work',
           language: (data.language as Language) || 'en',
           progress: {
-            mentalClarity: data.mental_clarity || 3.2,
-            backHealth: data.back_health || 45,
-            sessionsCompleted: data.sessions_completed || 0
+            mentalClarity: data.mental_clarity ?? 0,
+            backHealth: data.back_health ?? 0,
+            sessionsCompleted: data.sessions_completed ?? 0
           }
         };
         setUser(userData);
@@ -91,10 +91,19 @@ const App: React.FC = () => {
      // This flow is replaced by onAuthStateChange
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
+
+
+  const handleUpdateUser = async (updatedUser: User) => {
     setUser(updatedUser);
-    // TODO: Update Supabase profile here
+    if (!user) return;
+    
+    // Get session ID to update profile
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+        await updateProfile(session.user.id, updatedUser);
+    }
   };
+
 
   const handleLogout = async () => {
     await signOut();
@@ -106,25 +115,47 @@ const App: React.FC = () => {
     setCurrentPage(Page.RITUAL);
   };
 
-  const handleSessionComplete = () => {
+  const handleSessionComplete = async () => {
     if (!user) return;
     
     // Increment stats
-    const newClarity = Math.min(5, user.progress.mentalClarity + 0.3);
-    const newBack = Math.min(100, user.progress.backHealth + 8);
+    const newClarity = Math.min(10, user.progress.mentalClarity + 0.3); // Scale is 1-10 based on Insights? App says 1-5? Let's assume 10 max based on valid range.
+    // wait, initial default was 3.2. Insights mapped 10. Let's aim for 10.
+    const newBack = Math.min(100, user.progress.backHealth + 5);
+    const newSessions = user.progress.sessionsCompleted + 1;
     
-    setUser({
+    // Optimistic update
+    const updatedUser = {
       ...user,
       progress: {
         mentalClarity: parseFloat(newClarity.toFixed(1)),
         backHealth: newBack,
-        sessionsCompleted: user.progress.sessionsCompleted + 1
+        sessionsCompleted: newSessions
       }
-    });
+    };
     
+    setUser(updatedUser);
     setCurrentPage(Page.DASHBOARD);
+    
+    // Persist to Supabase
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            // Update profile stats
+            await updateProfile(session.user.id, {
+                progress: updatedUser.progress
+            });
+            
+            // Log session history
+            if (activeMovement) {
+                await logSession(session.user.id, activeMovement.id, activeMovement.durationSeconds);
+            }
+        }
+    } catch (e) {
+        console.error("Error saving progress:", e);
+    }
+    
     setActiveMovement(null);
-    // TODO: Persist session completion to DB
   };
 
   if (loading) {
@@ -181,6 +212,7 @@ const App: React.FC = () => {
             <Insights 
               t={t}
               lang={user.language}
+              user={user}
             />
           )}
           {currentPage === Page.SETTINGS && user && (

@@ -1,21 +1,26 @@
 
 import React, { useState, useEffect } from 'react';
 import { geminiService } from '../services/geminiService';
+import { User } from '../types';
 
 interface InsightsProps {
   t: (key: any) => string;
   lang: string;
+  user: User;
 }
 
-const Insights: React.FC<InsightsProps> = ({ t, lang }) => {
+const Insights: React.FC<InsightsProps> = ({ t, lang, user }) => {
   const [synergies, setSynergies] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string>('');
 
   const fetchNewSynergy = async () => {
     setLoading(true);
     try {
       const tip = await geminiService.generateSynergyTip(lang);
-      setSynergies(prev => [tip, ...prev].slice(0, 3));
+      if (tip) {
+        setSynergies(prev => [tip, ...prev].slice(0, 3));
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -24,9 +29,23 @@ const Insights: React.FC<InsightsProps> = ({ t, lang }) => {
   };
 
   useEffect(() => {
-    // Refresh synergies when language changes
     fetchNewSynergy();
-  }, [lang]);
+    
+    // Generate personalized insight
+    const generateInsight = async () => {
+        const level = user.progress.mentalClarity < 4 ? 'Low' : user.progress.mentalClarity < 7 ? 'Moderate' : 'High';
+        try {
+            const insight = await geminiService.generateBrainInsight(level, lang);
+            setAiInsight(insight);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+    generateInsight();
+
+  }, [lang, user.progress.mentalClarity]); 
+
+  const synergyScore = Math.min(100, Math.round((user.progress.sessionsCompleted / 10) * 100));
 
   return (
     <div className="p-4 md:p-10 max-w-6xl mx-auto space-y-10 animate-in fade-in duration-700">
@@ -45,27 +64,27 @@ const Insights: React.FC<InsightsProps> = ({ t, lang }) => {
             <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">LIVE SYNC</div>
           </div>
           <div className="mt-4">
-            <p className="text-white text-[42px] font-bold leading-tight truncate">92% Synergy</p>
+            <p className="text-white text-[42px] font-bold leading-tight truncate">{synergyScore}% Synergy</p>
             <div className="flex gap-2 items-center">
-              <p className="text-[#92adc9] text-sm">Real-time biomechanical analysis</p>
+              <p className="text-[#92adc9] text-sm">Based on {user.progress.sessionsCompleted} sessions</p>
               <p className="text-emerald-500 text-sm font-bold flex items-center">
                 <span className="material-symbols-outlined text-sm">trending_up</span>
-                +12.4%
+                Target: 10
               </p>
             </div>
           </div>
           <div className="flex min-h-[220px] flex-col gap-8 py-4">
-            {/* Graph logic remains same */}
-            <svg fill="none" height="160" preserveAspectRatio="none" viewBox="-3 0 478 150" width="100%" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z" fill="url(#paint0_linear)"></path>
-              <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#137fec" strokeLinecap="round" strokeWidth="3"></path>
-              <defs>
-                <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear" x1="236" x2="236" y1="1" y2="149">
-                  <stop stopColor="#137fec" stopOpacity="0.3"></stop>
-                  <stop offset="1" stopColor="#137fec" stopOpacity="0"></stop>
-                </linearGradient>
-              </defs>
-            </svg>
+             {/* Simplified Visualization */}
+             <div className="flex h-[160px] items-end justify-between px-4 gap-2">
+                {[...Array(7)].map((_, i) => (
+                    <div key={i} className="w-full bg-[#324d67]/30 rounded-t-sm h-full relative overflow-hidden group">
+                        <div 
+                            className="absolute bottom-0 w-full bg-primary/50 transition-all duration-1000 group-hover:bg-primary"
+                            style={{ height: `${Math.random() * 40 + 20}%` }} // Placeholder visualization
+                        ></div>
+                    </div>
+                ))}
+             </div>
           </div>
         </div>
 
@@ -74,9 +93,11 @@ const Insights: React.FC<InsightsProps> = ({ t, lang }) => {
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-primary">auto_awesome</span>
-                <h3 className="text-lg font-bold">{t('neuralForecast')}</h3>
+                <h3 className="text-lg font-bold">{t('neuralForecast')} ({user.progress.mentalClarity.toFixed(1)})</h3>
               </div>
-              <p className="text-sm text-white/80 leading-relaxed">AI predicts a 14% drop in focus in 45 minutes. Schedule a 2m Cervical Reset now.</p>
+              <p className="text-sm text-white/80 leading-relaxed">
+                {aiInsight || (lang === 'es' ? 'Analizando patrones neuronales...' : 'Analyzing neural patterns...')}
+              </p>
             </div>
           </div>
 
@@ -84,13 +105,13 @@ const Insights: React.FC<InsightsProps> = ({ t, lang }) => {
             <h4 className="text-white text-sm font-bold mb-4">{t('coreMetrics')}</h4>
             <div className="space-y-4">
               {[
-                { l: 'Synaptic Density', c: 'bg-primary', w: '75%' },
-                { l: 'Cortisol Regulation', c: 'bg-emerald-400', w: '90%' },
+                { l: t('mentalClarity'), c: 'bg-primary', v: user.progress.mentalClarity, max: 10 },
+                { l: 'Back Health', c: 'bg-emerald-400', v: user.progress.backHealth, max: 100 },
               ].map((m) => (
                 <div key={m.l} className="flex justify-between items-center">
                   <span className="text-xs text-[#92adc9]">{m.l}</span>
                   <div className="w-32 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                    <div className={`${m.c} h-1.5 rounded-full transition-all duration-1000`} style={{ width: m.w }}></div>
+                    <div className={`${m.c} h-1.5 rounded-full transition-all duration-1000`} style={{ width: `${(m.v / m.max) * 100}%` }}></div>
                   </div>
                 </div>
               ))}

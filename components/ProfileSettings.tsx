@@ -59,6 +59,17 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
               />
             </div>
             <div className="flex flex-col gap-2 md:col-span-2">
+              <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">Avatar URL</label>
+              <input 
+                type="text" 
+                name="avatar"
+                value={formData.avatar}
+                onChange={handleChange}
+                placeholder="https://example.com/avatar.jpg"
+                className="bg-[#233648] border-none rounded-xl text-white focus:ring-primary h-12 px-4"
+              />
+            </div>
+            <div className="flex flex-col gap-2 md:col-span-2">
               <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('bioGoal')}</label>
               <select 
                 name="goal"

@@ -47,11 +47,44 @@ export const getProfile = async (userId: string) => {
 };
 
 export const updateProfile = async (userId: string, updates: Partial<User>) => {
+  const dbUpdates: any = {};
+  if (updates.name) dbUpdates.full_name = updates.name;
+  if (updates.avatar) dbUpdates.avatar_url = updates.avatar;
+  if (updates.goal) dbUpdates.goal = updates.goal;
+  if (updates.language) dbUpdates.language = updates.language;
+  if (updates.progress) {
+    dbUpdates.mental_clarity = updates.progress.mentalClarity;
+    dbUpdates.back_health = updates.progress.backHealth;
+    dbUpdates.sessions_completed = updates.progress.sessionsCompleted;
+  }
+
   const { data, error } = await supabase
     .from('profiles')
-    .update(updates)
+    .update(dbUpdates)
     .eq('id', userId)
     .select()
     .single();
+  return { data, error };
+};
+
+export const logSession = async (userId: string, movementId: string, duration: number) => {
+  const { data, error } = await supabase
+    .from('session_history')
+    .insert({
+      user_id: userId,
+      movement_id: movementId,
+      duration: duration
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const getSessionHistory = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('session_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('completed_at', { ascending: false });
   return { data, error };
 };
