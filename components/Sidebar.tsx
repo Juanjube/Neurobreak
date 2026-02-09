@@ -6,9 +6,11 @@ interface SidebarProps {
   onNavigate: (page: Page) => void;
   currentPage: Page;
   t: (key: any) => string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, onClose }) => {
   const [fatigue, setFatigue] = useState(24);
 
   useEffect(() => {
@@ -22,7 +24,33 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t }) => {
   }, []);
 
   return (
-    <aside className="hidden md:flex w-80 border-r border-[#233648] bg-background-dark p-6 flex-col gap-8">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm animate-in fade-in"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar / Drawer */}
+      <aside className={`
+        fixed md:relative z-50 md:z-auto
+        w-72 md:w-80 h-full md:h-auto
+        border-r border-[#233648] bg-background-dark p-6 flex flex-col gap-8
+        transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {/* Mobile Header */}
+        <div className="flex md:hidden items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-primary">
+                <img src="/Logo.jpg" alt="Logo" className="size-8 rounded-full object-cover" />
+                <h2 className="text-white text-lg font-bold">NeuroBreak</h2>
+            </div>
+            <button onClick={onClose} className="text-[#92adc9]">
+                <span className="material-symbols-outlined">close</span>
+            </button>
+        </div>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h3 className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">{t('fatigueMonitoring')}</h3>
@@ -57,21 +85,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t }) => {
           <h3 className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">Core Navigation</h3>
           <div className="flex flex-col gap-1">
             <button 
-              onClick={() => onNavigate(Page.DASHBOARD)}
+              onClick={() => { onNavigate(Page.DASHBOARD); onClose(); }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.DASHBOARD ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
             >
               <span className="material-symbols-outlined">dashboard</span>
               <p className="text-sm">{t('dashboard')}</p>
             </button>
             <button 
-              onClick={() => onNavigate(Page.INSIGHTS)}
+              onClick={() => { onNavigate(Page.INSIGHTS); onClose(); }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.INSIGHTS ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
             >
               <span className="material-symbols-outlined">psychology</span>
               <p className="text-sm">{t('cognitiveLab')}</p>
             </button>
             <button 
-              onClick={() => onNavigate(Page.MOVEMENT_ENGINE)}
+              onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MOVEMENT_ENGINE ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
             >
               <span className="material-symbols-outlined">exercise</span>
@@ -83,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t }) => {
 
       <div className="mt-auto">
         <button 
-          onClick={() => onNavigate(Page.MOVEMENT_ENGINE)}
+          onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
           className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-12 font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95"
         >
           <span className="material-symbols-outlined text-xl">play_circle</span>
@@ -91,6 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t }) => {
         </button>
       </div>
     </aside>
+    </>
   );
 };
 

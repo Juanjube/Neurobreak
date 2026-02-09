@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [activeMovement, setActiveMovement] = useState<Movement | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check active session
@@ -175,6 +176,7 @@ const App: React.FC = () => {
         onNavigate={setCurrentPage} 
         currentPage={currentPage}
         t={t}
+        onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
       
       <div className="flex flex-1">
@@ -182,6 +184,8 @@ const App: React.FC = () => {
           onNavigate={setCurrentPage} 
           currentPage={currentPage}
           t={t}
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
         />
         
         <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto max-h-[calc(100vh-64px)]">

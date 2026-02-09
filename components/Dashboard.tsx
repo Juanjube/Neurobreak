@@ -60,7 +60,7 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, onStartRitual, t, lang 
 
       <section>
         <h2 className="text-white text-xl font-bold mb-6">{t('dailyTargets')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div className="bg-card-dark p-6 rounded-2xl border border-[#233648] relative overflow-hidden group transition-all hover:bg-white/5">
             <div className="relative z-10">
               <p className="text-[#92adc9] text-sm font-semibold mb-1">{t('mentalClarity')}</p>

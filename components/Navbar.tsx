@@ -8,14 +8,21 @@ interface NavbarProps {
   onNavigate: (page: Page) => void;
   currentPage: Page;
   t: (key: any) => string;
+  onToggleMenu: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage, t }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage, t, onToggleMenu }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#233648] px-10 py-3 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="flex items-center gap-8">
+    <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#233648] px-4 md:px-10 py-3 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="flex items-center gap-4 md:gap-8">
+        <button 
+          onClick={onToggleMenu}
+          className="md:hidden text-[#92adc9] hover:text-white"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
         <div 
           className="flex items-center gap-3 text-primary cursor-pointer"
           onClick={() => onNavigate(Page.DASHBOARD)}
