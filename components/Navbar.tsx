@@ -51,18 +51,21 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
           >
             {t('dashboard')}
           </button>
-          <button 
-            onClick={() => onNavigate(Page.MOVEMENT_ENGINE)}
-            className={`${currentPage === Page.MOVEMENT_ENGINE ? 'text-primary' : 'text-[#92adc9]'} hover:text-white transition-colors text-sm font-medium leading-normal`}
-          >
-            {t('movementEngine')}
-          </button>
+
           <button 
             onClick={() => onNavigate(Page.INSIGHTS)}
             className={`${currentPage === Page.INSIGHTS ? 'text-primary' : 'text-[#92adc9]'} hover:text-white transition-colors text-sm font-medium leading-normal`}
           >
             {t('cognitiveLab')}
           </button>
+          
+          <button 
+            onClick={() => onNavigate(Page.MOVEMENT_ENGINE)}
+            className={`${currentPage === Page.MOVEMENT_ENGINE ? 'text-primary' : 'text-[#92adc9]'} hover:text-white transition-colors text-sm font-medium leading-normal`}
+          >
+            {t('movementEngine')}
+          </button>
+     
         </nav>
 
         <div className="flex gap-2">
