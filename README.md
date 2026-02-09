@@ -1,98 +1,98 @@
 <div align="center">
   <img src="Logo.jpg" alt="NeuroBreak Logo" width="120" height="120" style="border-radius: 50%;">
   <h1>NeuroBreak</h1>
-  <h3>Data-Driven Cognitive Optimization Platform</h3>
+  <h3>Plataforma de Optimización Cognitiva Basada en Datos</h3>
   <p>
-    <i>High-performance wellness for the digital athlete.</i>
+    <i>Bienestar de alto rendimiento para el atleta digital.</i>
   </p>
 </div>
 
 ---
 
-## 🧠 What is NeuroBreak?
+## 🧠 ¿Qué es NeuroBreak?
 
-**NeuroBreak** is a specialized platform designed for knowledge workers, developers, and digital professionals who spend long hours at a desk. It acts as a **"System Monitor" for your body and brain**, helping you maintain peak cognitive performance while preventing physical burnout.
+**NeuroBreak** es una plataforma especializada diseñada para trabajadores del conocimiento, desarrolladores y profesionales digitales que pasan largas horas frente a un escritorio. Actúa como un **"Monitor del Sistema" para tu cuerpo y cerebro**, ayudándote a mantener un rendimiento cognitivo máximo mientras previenes el agotamiento físico.
 
-Unlike generic fitness apps, NeuroBreak focuses on **micro-dosing wellness**: short, high-impact interventions that fit seamlessly into a deep-work schedule.
+A diferencia de las aplicaciones de fitness genéricas, NeuroBreak se centra en la **micro-dosificación del bienestar**: intervenciones cortas y de alto impacto que se integran perfectamente en un horario de trabajo profundo ("deep work").
 
-## 🚀 Key Features
+## 🚀 Características Principales
 
-### 1. 📊 Brain Vitality Dashboard
+### 1. 📊 Tablero de Vitalidad Cerebral
 
-- **Real-time Monitoring**: Tracks your **Mental Clarity** and **Back Health** based on your session history.
-- **Neural Load**: Visualizes your cognitive fatigue and suggests when to take a break.
-- **Gamified Progress**: Earn "Synergy" points by completing daily rituals.
+- **Monitoreo en Tiempo Real**: Rastrea tu **Claridad Mental** y **Salud de Espalda** basado en tu historial de sesiones.
+- **Carga Neuronal**: Visualiza tu fatiga cognitiva y sugiere cuándo tomar un descanso.
+- **Progreso Gamificado**: Gana puntos de "Sinergia" al completar rituales diarios.
 
-### 2. ⚡ Movement Engine
+### 2. ⚡ Motor de Movimiento
 
-- **Curated Rituals**: Access a library of scientific "bio-hacks" (e.g., _Dopamine Reset_, _Spinal Decompression_, _Ocular Refresh_).
-- **Guided Sessions**: Interactive timers and visual guides for exercises specifically designed for desk workers.
-- **Instant Relief**: Fix back pain, eye strain, and "brain fog" in under 5 minutes.
+- **Rituales Curados**: Accede a una biblioteca de "bio-hacks" científicos (ej. _Reinicio de Dopamina_, _Descompresión Espinal_, _Refresco Ocular_).
+- **Sesiones Guiadas**: Temporizadores interactivos y guías visuales para ejercicios diseñados específicamente para trabajadores de escritorio.
+- **Alivio Instantáneo**: Soluciona el dolor de espalda, la fatiga visual y la "niebla mental" en menos de 5 minutos.
 
-### 3. 🧪 Cognitive Lab (AI Insights)
+### 3. 🧪 Laboratorio Cognitivo (Insights IA)
 
-- **Neural Forecast**: Uses **AI** to analyze your fatigue data and predict your optimal work window.
-- **Nutritional Synergy**: Generates daily, science-backed nutritional tips (e.g., pairing _Vitamin D + Omega-3_) to boost neuroplasticity.
-- **Smart Analysis**: Powered by **Llama 3 (via Groq)** for fast, accurate health intelligence.
+- **Pronóstico Neuronal**: Utiliza **IA** para analizar tus datos de fatiga y predecir tu ventana de trabajo óptima.
+- **Sinergia Nutricional**: Genera consejos nutricionales diarios respaldados por la ciencia (ej. combinar _Vitamina D + Omega-3_) para impulsar la neuroplasticidad.
+- **Análisis Inteligente**: Impulsado por **Llama 3 (vía Groq)** para una inteligencia de salud rápida y precisa.
 
-### 4. 🤖 Neuro-Assistant (NEW)
+### 4. 🤖 Neuro-Asistente (NUEVO)
 
-- **AI Chatbot**: A built-in assistant available 24/7.
-- **Ask Anything**: Query the AI about posture, diet, sleep optimization, or productivity hacks.
-- **Context-Aware**: Understands your current state to give relevant advice.
+- **Chatbot con IA**: Un asistente integrado disponible 24/7.
+- **Pregunta lo que sea**: Consulta a la IA sobre postura, dieta, optimización del sueño o trucos de productividad.
+- **Consciente del Contexto**: Entiende tu estado actual para dar consejos relevantes.
 
-### 5. 📱 Mobile Responsive
+### 5. 📱 Responsivo (Móvil)
 
-- **Cross-Platform**: Fully functional on Desktop and Mobile.
-- **On-the-Go**: Take your wellness rituals with you anywhere.
+- **Multiplataforma**: Totalmente funcional en Escritorio y Móvil.
+- **Sobre la marcha**: Lleva tus rituales de bienestar contigo a cualquier lugar.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Stack Tecnológico
 
 - **Frontend**: React (Vite), TypeScript
-- **Styling**: Tailwind CSS
+- **Estilos**: Tailwind CSS
 - **Backend / Auth**: Supabase
-- **AI / LLM**: Groq API (Llama 3-70b)
-- **Icons**: Material Symbols
+- **IA / LLM**: Groq API (Llama 3-70b)
+- **Iconos**: Material Symbols
 
 ---
 
-## 💻 Running Locally
+## 💻 Ejecutar Localmente
 
-1.  **Clone the repository**
+1.  **Clonar el repositorio**
 
     ```bash
-    git clone https://github.com/your-username/neurobreak.git
+    git clone https://github.com/tu-usuario/neurobreak.git
     cd neurobreak
     ```
 
-2.  **Install dependencies**
+2.  **Instalar dependencias**
 
     ```bash
     npm install
     ```
 
-3.  **Environment Setup**
-    Create a `.env.local` file in the root directory and add your keys:
+3.  **Configuración de Entorno**
+    Crea un archivo `.env.local` en el directorio raíz y añade tus claves:
 
     ```env
-    VITE_SUPABASE_URL=your_supabase_url
-    VITE_SUPABASE_ANON_KEY=your_supabase_key
-    VITE_GROQ_API_KEY=your_groq_api_key
+    VITE_SUPABASE_URL=tu_url_supabase
+    VITE_SUPABASE_ANON_KEY=tu_clave_supabase
+    VITE_GROQ_API_KEY=tu_api_key_groq
     ```
 
-4.  **Run the App**
+4.  **Ejecutar la App**
     ```bash
     npm run dev
     ```
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contribuir
 
-We welcome contributions to help optimize the brains of workers everywhere! Please fork the repo and submit a PR.
+¡Agradecemos las contribuciones para ayudar a optimizar los cerebros de los trabajadores en todas partes! Por favor, haz un fork del repo y envía un PR.
 
 ---
 
-_NeuroBreak © 2026 - optimize your hardware._
+_NeuroBreak © 2026 - optimiza tu hardware._
