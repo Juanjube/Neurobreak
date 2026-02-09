@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/public/Logo.jpg" alt="NeuroBreak Logo" width="120" height="120" style="border-radius: 50%;">
+  <img src="Logo.jpg" alt="NeuroBreak Logo" width="120" height="120" style="border-radius: 50%;">
   <h1>NeuroBreak</h1>
   <h3>Data-Driven Cognitive Optimization Platform</h3>
   <p>
