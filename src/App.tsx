@@ -14,43 +14,56 @@ import { translations } from './constants/translations';
 import { supabase, getProfile, signOut, updateProfile, logSession } from './services/supabase';
 
 const App: React.FC = () => {
+  // currentPage guarda la vista actual en la que se encuentra el usuario (ej: Dashboard, Login, etc.)
   const [currentPage, setCurrentPage] = useState<Page>(Page.LOGIN);
+
+  // user almacena los datos del usuario logueado. Si es null, el usuario no ha iniciado sesión.
   const [user, setUser] = useState<User | null>(null);
+
+  // activeMovement guarda el ejercicio o movimiento seleccionado actualmente para realizar
   const [activeMovement, setActiveMovement] = useState<Movement | null>(null);
+
+  // loading indica si la aplicación está cargando datos iniciales (como la sesión del usuario)
   const [loading, setLoading] = useState(true);
+
+  // mobileMenuOpen controla si el menú lateral (Sidebar) está abierto o cerrado en dispositivos móviles
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check active session
+    // Al cargar la app, comprobamos si ya hay una sesión activa guardada en Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
+        // Si hay un usuario, obtenemos su perfil desde la base de datos
         fetchProfile(session.user.id, session.user.email!);
       } else {
+        // Si no hay sesión, dejamos de cargar y mostramos la pantalla de Login
         setLoading(false);
         setCurrentPage(Page.LOGIN);
       }
     });
 
-    // Listen for auth changes
+    // Nos suscribimos a cualquier cambio de estado en la autenticación (ej: cuando el usuario inicia o cierra sesión)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         fetchProfile(session.user.id, session.user.email!);
       } else {
+        // Al cerrar sesión, reseteamos el usuario y volvemos al Login
         setUser(null);
         setCurrentPage(Page.LOGIN);
         setLoading(false);
       }
     });
 
+    // Limpiamos la suscripción cuando el componente se desmonta para evitar fugas de memoria
     return () => subscription.unsubscribe();
   }, []);
 
   const fetchProfile = async (userId: string, email: string) => {
     try {
       const { data, error } = await getProfile(userId);
-      
+
       if (error) {
         console.error('Error fetching profile:', error);
         return;
@@ -90,7 +103,7 @@ const App: React.FC = () => {
   // Keeping this as a placeholder/type satisfier if needed for Auth component prop, 
   // but Auth component doesn't strictly depend on it for logic anymore.
   const handleLogin = (userData: User) => {
-     // This flow is replaced by onAuthStateChange
+    // This flow is replaced by onAuthStateChange
   };
 
 
@@ -98,11 +111,11 @@ const App: React.FC = () => {
   const handleUpdateUser = async (updatedUser: User) => {
     setUser(updatedUser);
     if (!user) return;
-    
+
     // Get session ID to update profile
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-        await updateProfile(session.user.id, updatedUser);
+      await updateProfile(session.user.id, updatedUser);
     }
   };
 
@@ -119,13 +132,13 @@ const App: React.FC = () => {
 
   const handleSessionComplete = async () => {
     if (!user) return;
-    
+
     // Increment stats
     const newClarity = Math.min(10, user.progress.mentalClarity + 0.3); // Scale is 1-10 based on Insights? App says 1-5? Let's assume 10 max based on valid range.
     // wait, initial default was 3.2. Insights mapped 10. Let's aim for 10.
     const newBack = Math.min(100, user.progress.backHealth + 5);
     const newSessions = user.progress.sessionsCompleted + 1;
-    
+
     // Optimistic update
     const updatedUser = {
       ...user,
@@ -135,33 +148,33 @@ const App: React.FC = () => {
         sessionsCompleted: newSessions
       }
     };
-    
+
     setUser(updatedUser);
     setCurrentPage(Page.DASHBOARD);
-    
+
     // Persist to Supabase
     try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            // Update profile stats
-            await updateProfile(session.user.id, {
-                progress: updatedUser.progress
-            });
-            
-            // Log session history
-            if (activeMovement) {
-                await logSession(session.user.id, activeMovement.id, activeMovement.durationSeconds);
-            }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Update profile stats
+        await updateProfile(session.user.id, {
+          progress: updatedUser.progress
+        });
+
+        // Log session history
+        if (activeMovement) {
+          await logSession(session.user.id, activeMovement.id, activeMovement.durationSeconds);
         }
+      }
     } catch (e) {
-        console.error("Error saving progress:", e);
+      console.error("Error saving progress:", e);
     }
-    
+
     setActiveMovement(null);
   };
 
   if (loading) {
-     return <div className="min-h-screen bg-background-dark flex items-center justify-center text-white">Loading...</div>;
+    return <div className="min-h-screen bg-background-dark flex items-center justify-center text-white">Loading...</div>;
   }
 
   if (!user) {
@@ -170,61 +183,61 @@ const App: React.FC = () => {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-dark">
-      <Navbar 
-        user={user} 
-        onLogout={handleLogout} 
-        onNavigate={setCurrentPage} 
+      <Navbar
+        user={user}
+        onLogout={handleLogout}
+        onNavigate={setCurrentPage}
         currentPage={currentPage}
         t={t}
         onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
-      
+
       <div className="flex flex-1">
-        <Sidebar 
-          onNavigate={setCurrentPage} 
+        <Sidebar
+          onNavigate={setCurrentPage}
           currentPage={currentPage}
           t={t}
           isOpen={mobileMenuOpen}
           onClose={() => setMobileMenuOpen(false)}
         />
-        
+
         <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto max-h-[calc(100vh-64px)]">
           {currentPage === Page.DASHBOARD && user && (
-            <Dashboard 
+            <Dashboard
               progress={user.progress}
-              onStartRitual={() => setCurrentPage(Page.MOVEMENT_ENGINE)} 
-              t={t} 
+              onStartRitual={() => setCurrentPage(Page.MOVEMENT_ENGINE)}
+              t={t}
               lang={user.language}
             />
           )}
           {currentPage === Page.MOVEMENT_ENGINE && user && (
-            <MovementEngine 
-              onSelectMovement={handleSelectMovement} 
-              t={t} 
+            <MovementEngine
+              onSelectMovement={handleSelectMovement}
+              t={t}
               lang={user.language}
             />
           )}
           {currentPage === Page.RITUAL && user && (
-            <Ritual 
-              movement={activeMovement} 
-              onBack={() => setCurrentPage(Page.MOVEMENT_ENGINE)} 
+            <Ritual
+              movement={activeMovement}
+              onBack={() => setCurrentPage(Page.MOVEMENT_ENGINE)}
               onComplete={handleSessionComplete}
               t={t}
               lang={user.language}
             />
           )}
           {currentPage === Page.INSIGHTS && user && (
-            <Insights 
+            <Insights
               t={t}
               lang={user.language}
               user={user}
             />
           )}
           {currentPage === Page.SETTINGS && user && (
-            <ProfileSettings 
-              user={user} 
-              onUpdateUser={handleUpdateUser} 
-              t={t} 
+            <ProfileSettings
+              user={user}
+              onUpdateUser={handleUpdateUser}
+              t={t}
             />
           )}
         </main>

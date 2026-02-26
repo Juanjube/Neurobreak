@@ -15,10 +15,16 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ progress, onStartRitual, t, lang }) => {
+  // insight guarda un mensaje generado por inteligencia artificial (Gemini)
+  // Inicialmente muestra un texto de carga traducido
   const [insight, setInsight] = useState(t('loadingIntelligence'));
 
   useEffect(() => {
+    // Al cambiar el idioma (lang), reseteamos el mensaje al estado de carga
     setInsight(t('loadingIntelligence'));
+
+    // Llamamos al servicio de Gemini para generar un nuevo "insight" (consejo o frase motivacional)
+    // basado en el estado 'Optimal' y en el idioma actual del usuario. Luego actualizamos el estado.
     geminiService.generateBrainInsight('Optimal', lang).then(setInsight);
   }, [lang]);
 
@@ -45,7 +51,7 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, onStartRitual, t, lang 
       <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden border border-[#233648] bg-black/40 shadow-2xl group cursor-pointer hover:border-primary/50 transition-all">
         <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-60 z-10"></div>
         <img src="https://picsum.photos/seed/brain/1200/500" alt="Neural Map" className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
-        
+
         <div className="absolute top-6 right-6 z-20 max-w-xs p-4 glass-panel rounded-xl text-[10px] leading-relaxed italic text-accent-cyan border border-accent-cyan/20">
           "{insight}"
         </div>

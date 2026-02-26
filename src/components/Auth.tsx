@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User } from '../types';
-import { signInWithPassword, signUp } from '../services/supabase';
+import { signInWithPassword, signUp, signInWithGoogle } from '../services/supabase';
 
 interface AuthProps {
   onLogin: (user: User) => void;
@@ -11,6 +11,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +45,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background-dark p-4">
-      <div className="w-full max-w-md bg-card-dark border border-white/10 p-8 rounded-2xl shadow-2xl">
-        <div className="flex flex-col items-center gap-4 mb-8">
-            <img src="/Logo.jpg" alt="NeuroBreak Logo" className="size-full rounded-2xl object-cover" />
-          <h1 className="text-3xl font-bold tracking-tight">NeuroBreak AI</h1>
+      <div className="w-full max-w-sm bg-card-dark border border-white/10 p-6 rounded-2xl shadow-2xl">
+        <div className="flex flex-col items-center gap-3 mb-6">
+          <img src="/Logo.jpg" alt="NeuroBreak Logo" className="size-24 rounded-2xl object-cover" />
+          <h1 className="text-2xl font-bold tracking-tight">NeuroBreak AI</h1>
           <p className="text-[#92adc9] text-sm text-center">Optimize your brain's performance with data-driven bio-hacks.</p>
         </div>
 
@@ -56,7 +57,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             {error}
           </div>
         )}
-        
+
         {infoMessage && (
           <div className="bg-green-500/10 border border-green-500/50 text-green-500 p-3 rounded-lg text-sm mb-4 text-center">
             {infoMessage}
@@ -67,11 +68,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           {!isLogin && (
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-[#92adc9] uppercase">Full Name</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary" 
+                className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary"
                 placeholder="Dr. Andrew Huberman"
                 required={!isLogin}
               />
@@ -79,32 +80,43 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           )}
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-[#92adc9] uppercase">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary" 
+              className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary"
               placeholder="neuro@science.com"
             />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs font-bold text-[#92adc9] uppercase">Password</label>
-            <input 
-              type="password" 
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary" 
-              placeholder="••••••••"
-              minLength={6}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary w-full pr-10"
+                placeholder="••••••••"
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#92adc9] hover:text-white"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <span className="material-symbols-outlined text-sm">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white h-12 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -114,8 +126,30 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </button>
         </form>
 
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#233648]"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-card-dark text-[#92adc9]">Or continue with</span>
+          </div>
+        </div>
+
+        <button
+          onClick={async () => {
+            setLoading(true);
+            await signInWithGoogle();
+            setLoading(false);
+          }}
+          disabled={loading}
+          className="w-full bg-white/5 hover:bg-white/10 text-white border border-[#233648] h-11 rounded-xl font-bold transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="size-5" />
+          Google
+        </button>
+
         <div className="mt-6 text-center">
-          <button 
+          <button
             onClick={() => {
               setIsLogin(!isLogin);
               setError(null);
