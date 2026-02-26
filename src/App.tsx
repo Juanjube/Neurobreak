@@ -12,6 +12,7 @@ import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
 import { supabase, getProfile, signOut, updateProfile, logSession } from './services/supabase';
+import "flag-icons/css/flag-icons.min.css";
 
 const App: React.FC = () => {
   // currentPage guarda la vista actual en la que se encuentra el usuario (ej: Dashboard, Login, etc.)

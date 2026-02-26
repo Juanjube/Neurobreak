@@ -40,8 +40,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('displayName')}</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -50,8 +50,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('emailAddress')}</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 readOnly
                 value={formData.email}
@@ -59,9 +59,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
               />
             </div>
             <div className="flex flex-col gap-2 md:col-span-2">
-              <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">Avatar URL</label>
-              <input 
-                type="text" 
+              <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('avatarUrl')}</label>
+              <input
+                type="text"
                 name="avatar"
                 value={formData.avatar}
                 onChange={handleChange}
@@ -71,16 +71,16 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
             </div>
             <div className="flex flex-col gap-2 md:col-span-2">
               <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('bioGoal')}</label>
-              <select 
+              <select
                 name="goal"
                 value={formData.goal}
                 onChange={handleChange}
                 className="bg-[#233648] border-none rounded-xl text-white focus:ring-primary h-12 px-4"
               >
-                <option value="Deep Work">Deep Work Optimization</option>
-                <option value="Creative Flow">Creative Flow State</option>
-                <option value="Back Health">Spinal & Postural Recovery</option>
-                <option value="Stress Management">Vagus Nerve Regulation</option>
+                <option value="Deep Work">{t('goalDeepWork')}</option>
+                <option value="Creative Flow">{t('goalCreativeFlow')}</option>
+                <option value="Back Health">{t('goalSpinalRecovery')}</option>
+                <option value="Stress Management">{t('goalVagusNerve')}</option>
               </select>
             </div>
           </div>
@@ -95,14 +95,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#92adc9] uppercase tracking-wider">{t('language')}</label>
               <div className="flex gap-4">
-                <button 
+                <button
                   type="button"
                   onClick={() => setFormData(p => ({ ...p, language: 'en' }))}
                   className={`flex-1 h-12 rounded-xl font-bold transition-all border ${formData.language === 'en' ? 'bg-primary border-primary text-white' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
                 >
                   English (EN)
                 </button>
-                <button 
+                <button
                   type="button"
                   onClick={() => setFormData(p => ({ ...p, language: 'es' }))}
                   className={`flex-1 h-12 rounded-xl font-bold transition-all border ${formData.language === 'es' ? 'bg-primary border-primary text-white' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
@@ -115,8 +115,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
         </section>
 
         <div className="flex items-center gap-4">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="bg-primary hover:bg-primary/90 text-white px-8 h-12 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 flex items-center gap-2"
           >
             <span className="material-symbols-outlined">save</span>
@@ -124,7 +124,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
           </button>
           {saved && (
             <span className="text-accent-teal font-bold animate-pulse text-sm">
-              Settings updated successfully!
+              {t('settingsUpdated')}
             </span>
           )}
         </div>

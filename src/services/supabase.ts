@@ -26,13 +26,14 @@ export const signInWithGoogle = async () => {
   return { data, error };
 };
 
-export const signUp = async (email: string, password: string, fullName: string) => {
+export const signUp = async (email: string, password: string, fullName: string, goal?: string) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
+        goal: goal
       },
     },
   });
