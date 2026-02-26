@@ -30,9 +30,9 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, onStartRitual, t, lang 
 
   return (
     <div className="p-4 md:p-8 space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-wrap justify-between items-end gap-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
         <div className="flex flex-col gap-1">
-          <h1 className="text-white text-4xl font-black leading-tight tracking-tight">{t('brainVitalityMap')}</h1>
+          <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">{t('brainVitalityMap')}</h1>
           <p className="text-accent-cyan text-base font-medium">{t('currentState')}</p>
         </div>
         <div className="flex gap-4">

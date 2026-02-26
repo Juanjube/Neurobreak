@@ -182,7 +182,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-dark">
+    <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background-dark">
       <Navbar
         user={user}
         onLogout={handleLogout}
@@ -192,7 +192,7 @@ const App: React.FC = () => {
         onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar
           onNavigate={setCurrentPage}
           currentPage={currentPage}
@@ -201,7 +201,7 @@ const App: React.FC = () => {
           onClose={() => setMobileMenuOpen(false)}
         />
 
-        <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto max-h-[calc(100vh-64px)]">
+        <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto w-full pb-20 md:pb-0 relative">
           {currentPage === Page.DASHBOARD && user && (
             <Dashboard
               progress={user.progress}

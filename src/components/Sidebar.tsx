@@ -41,10 +41,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
 
       {/* Sidebar / Drawer */}
       <aside className={`
-        fixed md:relative z-50 md:z-auto
-        w-72 md:w-80 h-full md:h-auto
+        fixed inset-y-0 left-0 md:relative z-50 md:z-auto
+        w-72 md:w-80 h-full
         border-r border-[#233648] bg-background-dark p-6 flex flex-col gap-8
-        transition-transform duration-300 ease-in-out
+        transition-transform duration-300 ease-in-out overflow-y-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Mobile Header */}
