@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { geminiService } from '../services/geminiService';
+import { chatMessageSchema, firstValidationError } from '../utils/validation';
 
 interface AIChatButtonProps {
   t: (key: any) => string;
@@ -30,9 +31,15 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
   }, [messages, isOpen]);
 
   const handleSend = async () => {
-    if (!input.trim() || loading) return;
+    const parsed = chatMessageSchema.safeParse(input);
+    if (!parsed.success || loading) {
+      if (!parsed.success) {
+        setMessages(prev => [...prev, { role: 'ai', content: firstValidationError(parsed.error) }]);
+      }
+      return;
+    }
 
-    const userMsg = input.trim();
+    const userMsg = parsed.data;
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setInput('');
     setLoading(true);
@@ -109,6 +116,7 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder={lang === 'es' ? "Pregunta algo..." : "Ask something..."}
+                maxLength={1000}
                 className="flex-1 bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 px-4 text-sm focus:ring-1 focus:ring-primary"
               />
               <button 

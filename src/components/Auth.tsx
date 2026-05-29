@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { User } from '../types';
 import { signInWithPassword, signUp, signInWithGoogle } from '../services/supabase';
 import { translations } from '../constants/translations';
+import { firstValidationError, loginSchema, registrationSchema } from '../utils/validation';
 
 interface AuthProps {
   onLogin: (user: User) => void;
@@ -31,10 +32,26 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     try {
       if (isLogin) {
-        const { data, error } = await signInWithPassword(email, password);
+        const parsed = loginSchema.safeParse({ email, password });
+        if (!parsed.success) throw new Error(firstValidationError(parsed.error));
+
+        const { error } = await signInWithPassword(parsed.data.email, parsed.data.password);
         if (error) throw error;
       } else {
-        const { data, error } = await signUp(email, password, name, translations['en'][goal]);
+        const parsed = registrationSchema.safeParse({
+          name,
+          email,
+          password,
+          goal: translations['en'][goal],
+        });
+        if (!parsed.success) throw new Error(firstValidationError(parsed.error));
+
+        const { data, error } = await signUp(
+          parsed.data.email,
+          parsed.data.password,
+          parsed.data.name,
+          parsed.data.goal
+        );
         if (error) throw error;
         if (data.user && !data.session) {
           setInfoMessage('Registration successful! Please check your email to confirm your account.');
@@ -164,6 +181,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    maxLength={80}
                     className="bg-transparent border border-[#233648] rounded-xl text-white placeholder:text-white/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 transition-colors"
                     placeholder={language === 'en' ? "Name" : "Nombre"}
                   />
@@ -191,7 +209,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-transparent border border-[#233648] rounded-xl text-white placeholder:text-white/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full pr-12 transition-colors"
                     placeholder={language === 'en' ? "Password" : "Contraseña"}
-                    minLength={6}
+                    minLength={8}
+                    maxLength={128}
                   />
                   <button
                     type="button"
@@ -333,7 +352,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary w-full pr-10"
                 placeholder="••••••••"
-                minLength={6}
+                minLength={8}
+                maxLength={128}
               />
               <button
                 type="button"
@@ -396,4 +416,3 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 };
 
 export default Auth;
-

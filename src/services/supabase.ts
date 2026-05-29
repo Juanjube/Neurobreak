@@ -1,6 +1,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { User } from '../types';
+import {
+  displayNameSchema,
+  durationSchema,
+  firstValidationError,
+  movementIdSchema,
+  profileUpdateSchema,
+} from '../utils/validation';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -10,6 +17,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const getCurrentUserId = async () => {
+  const { data: { session }, error } = await supabase.auth.getSession();
+
+  if (error || !session?.user?.id) {
+    throw new Error('Authentication required');
+  }
+
+  return session.user.id;
+};
 
 export const signInWithPassword = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -22,17 +39,22 @@ export const signInWithPassword = async (email: string, password: string) => {
 export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+    },
   });
   return { data, error };
 };
 
 export const signUp = async (email: string, password: string, fullName: string, goal?: string) => {
+  const safeName = displayNameSchema.parse(fullName);
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        full_name: fullName,
+        full_name: safeName,
         goal: goal
       },
     },
@@ -46,6 +68,11 @@ export const signOut = async () => {
 };
 
 export const getProfile = async (userId: string) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot read another user profile');
+  }
+
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -55,33 +82,51 @@ export const getProfile = async (userId: string) => {
 };
 
 export const updateProfile = async (userId: string, updates: Partial<User>) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot update another user profile');
+  }
+
+  const parsed = profileUpdateSchema.safeParse(updates);
+  if (!parsed.success) {
+    throw new Error(firstValidationError(parsed.error));
+  }
+
   const dbUpdates: any = {};
-  if (updates.name) dbUpdates.full_name = updates.name;
-  if (updates.avatar) dbUpdates.avatar_url = updates.avatar;
-  if (updates.goal) dbUpdates.goal = updates.goal;
-  if (updates.language) dbUpdates.language = updates.language;
-  if (updates.progress) {
-    dbUpdates.mental_clarity = updates.progress.mentalClarity;
-    dbUpdates.back_health = updates.progress.backHealth;
-    dbUpdates.sessions_completed = updates.progress.sessionsCompleted;
+  if (parsed.data.name) dbUpdates.full_name = parsed.data.name;
+  if (parsed.data.avatar !== undefined) dbUpdates.avatar_url = parsed.data.avatar;
+  if (parsed.data.goal) dbUpdates.goal = parsed.data.goal;
+  if (parsed.data.language) dbUpdates.language = parsed.data.language;
+  if (parsed.data.progress) {
+    dbUpdates.mental_clarity = parsed.data.progress.mentalClarity;
+    dbUpdates.back_health = parsed.data.progress.backHealth;
+    dbUpdates.sessions_completed = parsed.data.progress.sessionsCompleted;
   }
 
   const { data, error } = await supabase
     .from('profiles')
     .update(dbUpdates)
-    .eq('id', userId)
+    .eq('id', currentUserId)
     .select()
     .single();
   return { data, error };
 };
 
 export const logSession = async (userId: string, movementId: string, duration: number) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot log a session for another user');
+  }
+
+  const safeMovementId = movementIdSchema.parse(movementId);
+  const safeDuration = durationSchema.parse(duration);
+
   const { data, error } = await supabase
     .from('session_history')
     .insert({
-      user_id: userId,
-      movement_id: movementId,
-      duration: duration
+      user_id: currentUserId,
+      movement_id: safeMovementId,
+      duration: safeDuration
     })
     .select()
     .single();
@@ -89,10 +134,15 @@ export const logSession = async (userId: string, movementId: string, duration: n
 };
 
 export const getSessionHistory = async (userId: string) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot read another user session history');
+  }
+
   const { data, error } = await supabase
     .from('session_history')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', currentUserId)
     .order('completed_at', { ascending: false });
   return { data, error };
 };

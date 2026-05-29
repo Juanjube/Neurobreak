@@ -110,13 +110,14 @@ const App: React.FC = () => {
 
 
   const handleUpdateUser = async (updatedUser: User) => {
-    setUser(updatedUser);
     if (!user) return;
 
     // Get session ID to update profile
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-      await updateProfile(session.user.id, updatedUser);
+      const { error } = await updateProfile(session.user.id, updatedUser);
+      if (error) throw error;
+      setUser(updatedUser);
     }
   };
 
