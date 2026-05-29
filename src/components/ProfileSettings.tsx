@@ -196,7 +196,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                     onClick={() => setFormData(prev => ({ ...prev, language: 'es' }))}
                     className={`cursor-pointer h-12 rounded-lg font-bold transition-colors border ${formData.language === 'es' ? 'bg-primary border-primary text-white' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
                   >
-                    Espanol
+                    Español
                   </button>
                 </div>
               </div>
