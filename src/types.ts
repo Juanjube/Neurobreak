@@ -1,5 +1,6 @@
 
 export interface User {
+  id: string;
   name: string;
   email: string;
   avatar: string;
@@ -27,10 +28,35 @@ export interface Movement {
   intensity: 'Low' | 'Medium' | 'High';
 }
 
+export type MindGameCategory = 'Memory' | 'Focus' | 'Pattern';
+
+export interface MindGame {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  durationSeconds: number;
+  icon: string;
+  category: MindGameCategory;
+  neuroBenefit: string;
+  difficulty: 'Easy' | 'Medium';
+}
+
+export interface MindGameSession {
+  id: string;
+  user_id: string;
+  game_id: string;
+  score: number | null;
+  duration: number;
+  variant_seed: string;
+  completed_at: string;
+}
+
 export enum Page {
   LOGIN = 'login',
   DASHBOARD = 'dashboard',
   MOVEMENT_ENGINE = 'movement_engine',
+  MIND_GAMES = 'mind_games',
   RITUAL = 'ritual',
   INSIGHTS = 'insights',
   SETTINGS = 'settings'

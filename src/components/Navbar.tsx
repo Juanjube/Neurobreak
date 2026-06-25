@@ -67,6 +67,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
             {t('movementEngine')}
           </button>
 
+          <button
+            onClick={() => onNavigate(Page.MIND_GAMES)}
+            className={`${currentPage === Page.MIND_GAMES ? 'text-primary' : 'text-[#92adc9]'} hover:text-white transition-colors text-sm font-medium leading-normal`}
+          >
+            {t('mindGames')}
+          </button>
+
         </nav>
 
         <div className="flex gap-2">

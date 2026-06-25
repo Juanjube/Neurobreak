@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Page, User, Language, Movement } from './types';
+import { Page, User, Language, Movement, MindGame } from './types';
 import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
 import MovementEngine from './components/MovementEngine';
+import MindGames from './components/MindGames';
 import Ritual from './components/Ritual';
 import Insights from './components/Insights';
 import ProfileSettings from './components/ProfileSettings';
@@ -73,6 +74,7 @@ const App: React.FC = () => {
       if (data) {
         // Map DB profile to User object
         const userData: User = {
+          id: userId,
           name: data.full_name || 'Explorer',
           email: email,
           avatar: data.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8tVVenH4DAYEjgMcmJ3MhTfeSY7hLzxL3LH8vuuMQcXlK6UWw67D4PK06KVu6pjEAOdnthAhxmEstZY1xrmqeuFWfh_7tetgkURLbkZu6DoXIxztVqPmcJAxhRwI2CEKff6Zo78mLCSp_-Gmuwb-Sl-1n8gtW_pIQYXEFUripk-Qm_KWVDkSIue0_1GWTKVZPjEfKpAx0D2_LrFM8Wn-oo5KybVeuzSGTiy_1ogWLP9_blRY-6HjV4R-KgPKDIC8bdQ31orxbiTnH',
@@ -175,6 +177,29 @@ const App: React.FC = () => {
     setActiveMovement(null);
   };
 
+  const handleMindGameComplete = async (_game: MindGame, _score: number | null, _duration: number, _variantSeed: string) => {
+    if (!user) return;
+
+    const newClarity = Math.min(10, user.progress.mentalClarity + 0.2);
+    const updatedUser = {
+      ...user,
+      progress: {
+        ...user.progress,
+        mentalClarity: parseFloat(newClarity.toFixed(1))
+      }
+    };
+
+    setUser(updatedUser);
+
+    try {
+      await updateProfile(user.id, {
+        progress: updatedUser.progress
+      });
+    } catch (e) {
+      console.error("Error saving mind game progress:", e);
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen bg-background-dark flex items-center justify-center text-white">Loading...</div>;
   }
@@ -201,6 +226,7 @@ const App: React.FC = () => {
           t={t}
           isOpen={mobileMenuOpen}
           onClose={() => setMobileMenuOpen(false)}
+          user={user}
         />
 
         <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto w-full pb-20 md:pb-0 relative">
@@ -215,6 +241,14 @@ const App: React.FC = () => {
           {currentPage === Page.MOVEMENT_ENGINE && user && (
             <MovementEngine
               onSelectMovement={handleSelectMovement}
+              t={t}
+              lang={user.language}
+            />
+          )}
+          {currentPage === Page.MIND_GAMES && user && (
+            <MindGames
+              user={user}
+              onCompleteGame={handleMindGameComplete}
               t={t}
               lang={user.language}
             />

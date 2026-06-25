@@ -1,6 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
-import { Page } from '../types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Page, User, MindGameSession } from '../types';
+import { getSessionHistory, getMindGameHistory } from '../services/supabase';
+import { calculateWellnessMetrics, PhysicalSession } from '../utils/wellnessMetrics';
 
 interface SidebarProps {
   onNavigate: (page: Page) => void;
@@ -8,26 +10,42 @@ interface SidebarProps {
   t: (key: any) => string;
   isOpen: boolean;
   onClose: () => void;
+  user: User;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, onClose }) => {
-  // fatigue guarda un valor simulado de "fatiga cognitiva". Va de 10 a 80.
-  const [fatigue, setFatigue] = useState(24);
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, onClose, user }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [physicalHistory, setPhysicalHistory] = useState<PhysicalSession[]>([]);
+  const [mentalHistory, setMentalHistory] = useState<MindGameSession[]>([]);
+
+  const loadHistories = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const [physRes, mentRes] = await Promise.all([
+        getSessionHistory(user.id),
+        getMindGameHistory(user.id, 20)
+      ]);
+
+      if (physRes.error) throw physRes.error;
+      if (mentRes.error) throw mentRes.error;
+
+      setPhysicalHistory((physRes.data || []) as PhysicalSession[]);
+      setMentalHistory((mentRes.data || []) as MindGameSession[]);
+    } catch (err) {
+      console.error('Error loading sidebar wellness history:', err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [user.id]);
 
   useEffect(() => {
-    // Simulamos un cambio dinámico en la fatiga cada 5 segundos
-    const interval = setInterval(() => {
-      setFatigue(prev => {
-        // Añade o resta un valor pequeño aleatorio a la fatiga actual
-        const delta = Math.random() * 2 - 1;
-        // Mantiene el valor siempre dentro de los límites de 10 a 80
-        return Math.max(10, Math.min(80, prev + delta));
-      });
-    }, 5000);
+    loadHistories();
+  }, [loadHistories, user.progress.sessionsCompleted, user.progress.mentalClarity, user.progress.backHealth]);
 
-    // Limpieza: detiene el intervalo cuando el componente se destruye
-    return () => clearInterval(interval);
-  }, []);
+  const metrics = calculateWellnessMetrics(user, physicalHistory, mentalHistory);
 
   return (
     <>
@@ -58,31 +76,77 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           </button>
         </div>
         <div className="flex flex-col gap-6">
+          {error && (
+            <div className="text-center bg-red-500/10 border border-red-500/20 py-1.5 px-3 rounded-lg text-[10px] text-red-400 flex items-center justify-center gap-1.5 animate-pulse">
+              <span className="material-symbols-outlined text-xs">cloud_off</span>
+              {t('liveDataUnavailable')}
+            </div>
+          )}
+
           <div className="flex flex-col gap-2">
             <h3 className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">{t('fatigueMonitoring')}</h3>
             <div className="bg-card-dark p-4 rounded-xl border border-[#233648]">
               <div className="flex justify-between items-end mb-2">
                 <span className="text-sm font-medium">{t('cognitiveFatigue')} (MF)</span>
-                <span className={`text-xl font-bold ${fatigue > 60 ? 'text-red-400' : 'text-accent-teal'}`}>
-                  {fatigue > 60 ? 'High' : fatigue > 40 ? 'Mid' : 'Low'}
+                <span className={`text-xl font-bold ${
+                  metrics.cognitiveFatigueLabel === 'High' ? 'text-red-400' :
+                  metrics.cognitiveFatigueLabel === 'Mid' ? 'text-amber-400' : 'text-accent-teal'
+                }`}>
+                  {t(
+                    metrics.cognitiveFatigueLabel === 'High' ? 'levelHigh' :
+                    metrics.cognitiveFatigueLabel === 'Mid' ? 'levelMid' : 'levelLow'
+                  )}
                 </span>
               </div>
               <div className="w-full bg-[#233648] h-2 rounded-full overflow-hidden">
                 <div
-                  className={`h-full transition-all duration-1000 ${fatigue > 60 ? 'bg-red-400' : 'bg-accent-teal'}`}
-                  style={{ width: `${fatigue}%` }}
+                  className={`h-full transition-all duration-1000 ${
+                    metrics.cognitiveFatigueLabel === 'High' ? 'bg-red-400' :
+                    metrics.cognitiveFatigueLabel === 'Mid' ? 'bg-amber-400' : 'bg-accent-teal'
+                  }`}
+                  style={{ width: `${metrics.cognitiveFatigueScore}%` }}
                 ></div>
               </div>
-              <p className="text-[10px] text-[#92adc9] mt-2">Homeostasis: {fatigue > 60 ? 'Stressed' : 'Stable'}</p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-[10px] text-[#92adc9]">
+                  Homeostasis: {loading ? t('homeostasisLoading') : t(metrics.homeostasisLabel === 'Stressed' ? 'homeostasisStressed' : 'homeostasisStable')}
+                </p>
+                <p className="text-[10px] text-[#92adc9] font-mono">{metrics.cognitiveFatigueScore}%</p>
+              </div>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl flex items-start gap-3">
-              <span className="material-symbols-outlined text-red-500 text-xl">warning</span>
+            <div className={`border p-4 rounded-xl flex items-start gap-3 transition-colors duration-500 ${
+              metrics.ergonomicRiskLabel === 'High' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+              metrics.ergonomicRiskLabel === 'Mid' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
+              'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+            }`}>
+              <span className={`material-symbols-outlined text-xl ${
+                metrics.ergonomicRiskLabel === 'High' ? 'text-red-500' :
+                metrics.ergonomicRiskLabel === 'Mid' ? 'text-amber-500' :
+                'text-emerald-500'
+              }`}>
+                {metrics.ergonomicRiskLabel === 'Low' ? 'check_circle' : 'warning'}
+              </span>
               <div>
-                <p className="text-sm font-bold text-red-400">{t('riskAlert')}</p>
-                <p className="text-[11px] text-red-200/70 leading-relaxed">Ergonomic risk detected.</p>
+                <p className={`text-sm font-bold ${
+                  metrics.ergonomicRiskLabel === 'High' ? 'text-red-400' :
+                  metrics.ergonomicRiskLabel === 'Mid' ? 'text-amber-400' :
+                  'text-emerald-400'
+                }`}>
+                  {t('riskAlert')} ({t(
+                    metrics.ergonomicRiskLabel === 'High' ? 'levelHigh' :
+                    metrics.ergonomicRiskLabel === 'Mid' ? 'levelMid' : 'levelLow'
+                  )})
+                </p>
+                <p className={`text-[11px] leading-relaxed mt-0.5 ${
+                  metrics.ergonomicRiskLabel === 'High' ? 'text-red-200/70' :
+                  metrics.ergonomicRiskLabel === 'Mid' ? 'text-amber-200/70' :
+                  'text-emerald-200/70'
+                }`}>
+                  {t(metrics.ergonomicRiskMessageKey)}
+                </p>
               </div>
             </div>
           </div>
@@ -110,6 +174,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
               >
                 <span className="material-symbols-outlined">exercise</span>
                 <p className="text-sm">{t('movementEngine')}</p>
+              </button>
+              <button
+                onClick={() => { onNavigate(Page.MIND_GAMES); onClose(); }}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MIND_GAMES ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
+              >
+                <span className="material-symbols-outlined">neurology</span>
+                <p className="text-sm">{t('mindGames')}</p>
               </button>
             </div>
           </div>

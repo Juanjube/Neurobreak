@@ -5,8 +5,11 @@ import {
   displayNameSchema,
   durationSchema,
   firstValidationError,
+  mindGameIdSchema,
   movementIdSchema,
   profileUpdateSchema,
+  scoreSchema,
+  variantSeedSchema,
 } from '../utils/validation';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -144,5 +147,53 @@ export const getSessionHistory = async (userId: string) => {
     .select('*')
     .eq('user_id', currentUserId)
     .order('completed_at', { ascending: false });
+  return { data, error };
+};
+
+export const logMindGameSession = async (
+  userId: string,
+  gameId: string,
+  score: number | null,
+  duration: number,
+  variantSeed: string
+) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot log a mind game session for another user');
+  }
+
+  const safeGameId = mindGameIdSchema.parse(gameId);
+  const safeScore = scoreSchema.parse(score);
+  const safeDuration = durationSchema.parse(duration);
+  const safeVariantSeed = variantSeedSchema.parse(variantSeed);
+
+  const { data, error } = await supabase
+    .from('mental_game_history')
+    .insert({
+      user_id: currentUserId,
+      game_id: safeGameId,
+      score: safeScore,
+      duration: safeDuration,
+      variant_seed: safeVariantSeed
+    })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const getMindGameHistory = async (userId: string, limit = 20) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot read another user mind game history');
+  }
+
+  const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
+
+  const { data, error } = await supabase
+    .from('mental_game_history')
+    .select('*')
+    .eq('user_id', currentUserId)
+    .order('completed_at', { ascending: false })
+    .limit(safeLimit);
   return { data, error };
 };

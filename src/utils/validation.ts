@@ -59,6 +59,7 @@ export const registrationSchema = z.object({
 });
 
 export const profileSchema = z.object({
+  id: z.string().uuid().optional(),
   name: displayNameSchema,
   email: emailSchema,
   avatar: avatarUrlSchema,
@@ -84,6 +85,18 @@ export const movementIdSchema = z
   .string()
   .transform(cleanText)
   .pipe(z.string().regex(/^[a-z0-9_-]{1,80}$/i, 'Invalid movement id.'));
+
+export const mindGameIdSchema = z
+  .string()
+  .transform(cleanText)
+  .pipe(z.string().regex(/^[a-z0-9_-]{1,80}$/i, 'Invalid mind game id.'));
+
+export const scoreSchema = z.number().int().min(0).max(100).nullable();
+
+export const variantSeedSchema = z
+  .string()
+  .transform(cleanText)
+  .pipe(z.string().regex(/^[a-z0-9_-]{1,120}$/i, 'Invalid variant seed.'));
 
 export const durationSchema = z.number().int().min(10).max(3600);
 
