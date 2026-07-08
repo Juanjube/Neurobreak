@@ -67,11 +67,11 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
           <div className="bg-primary/10 p-4 border-b border-[#233648] flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">psychology</span>
-              <h3 className="text-white font-bold text-sm">Neuro Assistant</h3>
+              <h3 className="text-content font-bold text-sm">Neuro Assistant</h3>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-[#92adc9] hover:text-white transition-colors"
+              className="text-[#92adc9] hover:text-content transition-colors"
             >
               <span className="material-symbols-outlined text-sm">close</span>
             </button>
@@ -87,7 +87,7 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
                 <div 
                   className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${
                     msg.role === 'user' 
-                      ? 'bg-primary text-white rounded-br-none' 
+                      ? 'bg-primary text-content rounded-br-none' 
                       : 'bg-[#233648] text-[#92adc9] rounded-bl-none'
                   }`}
                 >
@@ -117,12 +117,12 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
                 onKeyDown={handleKeyPress}
                 placeholder={lang === 'es' ? "Pregunta algo..." : "Ask something..."}
                 maxLength={1000}
-                className="flex-1 bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 px-4 text-sm focus:ring-1 focus:ring-primary"
+                className="flex-1 bg-[#233648] border-none rounded-xl text-content placeholder:text-content/20 px-4 text-sm focus:ring-1 focus:ring-primary"
               />
               <button 
                 onClick={handleSend}
                 disabled={!input.trim() || loading}
-                className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-xl flex items-center justify-center transition-colors"
+                className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-content p-2 rounded-xl flex items-center justify-center transition-colors"
               >
                 <span className="material-symbols-outlined text-xl">send</span>
               </button>
@@ -134,7 +134,7 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="pointer-events-auto bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-110 active:scale-95 flex items-center justify-center group"
+        className="pointer-events-auto bg-primary hover:bg-primary/90 text-content p-4 rounded-full shadow-lg shadow-primary/30 transition-all hover:scale-110 active:scale-95 flex items-center justify-center group"
       >
         <span className={`material-symbols-outlined text-2xl transition-transform duration-300 ${isOpen ? 'rotate-90 scale-0 absolute' : 'scale-100'}`}>
           chat_bubble

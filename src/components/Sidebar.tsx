@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
       <aside className={`
         fixed inset-y-0 left-0 md:relative z-50 md:z-auto
         w-72 md:w-80 h-full
-        border-r border-[#233648] bg-background-dark p-6 flex flex-col gap-8
+        border-r border-border bg-background p-6 flex flex-col gap-8
         transition-transform duration-300 ease-in-out overflow-y-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
@@ -69,9 +69,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
         <div className="flex md:hidden items-center justify-between mb-2">
           <div className="flex items-center gap-2 text-primary">
             <img src="/Logo.jpg" alt="Logo" className="size-8 rounded-full object-cover" />
-            <h2 className="text-white text-lg font-bold">NeuroBreak</h2>
+            <h2 className="text-content text-lg font-bold">NeuroBreak</h2>
           </div>
-          <button onClick={onClose} className="text-[#92adc9]">
+          <button onClick={onClose} className="text-muted">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -84,8 +84,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           )}
 
           <div className="flex flex-col gap-2">
-            <h3 className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">{t('fatigueMonitoring')}</h3>
-            <div className="bg-card-dark p-4 rounded-xl border border-[#233648]">
+            <h3 className="text-muted text-xs font-bold uppercase tracking-widest">{t('fatigueMonitoring')}</h3>
+            <div className="bg-surface p-4 rounded-xl border border-border">
               <div className="flex justify-between items-end mb-2">
                 <span className="text-sm font-medium">{t('cognitiveFatigue')} (MF)</span>
                 <span className={`text-xl font-bold ${
@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
                   )}
                 </span>
               </div>
-              <div className="w-full bg-[#233648] h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-border h-2 rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all duration-1000 ${
                     metrics.cognitiveFatigueLabel === 'High' ? 'bg-red-400' :
@@ -108,10 +108,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
                 ></div>
               </div>
               <div className="flex justify-between items-center mt-2">
-                <p className="text-[10px] text-[#92adc9]">
+                <p className="text-[10px] text-muted">
                   Homeostasis: {loading ? t('homeostasisLoading') : t(metrics.homeostasisLabel === 'Stressed' ? 'homeostasisStressed' : 'homeostasisStable')}
                 </p>
-                <p className="text-[10px] text-[#92adc9] font-mono">{metrics.cognitiveFatigueScore}%</p>
+                <p className="text-[10px] text-muted font-mono">{metrics.cognitiveFatigueScore}%</p>
               </div>
             </div>
           </div>
@@ -152,32 +152,32 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           </div>
 
           <div className="flex flex-col gap-2 mt-4">
-            <h3 className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">Core Navigation</h3>
+            <h3 className="text-muted text-xs font-bold uppercase tracking-widest">Core Navigation</h3>
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => { onNavigate(Page.DASHBOARD); onClose(); }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.DASHBOARD ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.DASHBOARD ? 'bg-primary/20 text-primary font-bold' : 'text-muted hover:bg-border'}`}
               >
                 <span className="material-symbols-outlined">dashboard</span>
                 <p className="text-sm">{t('dashboard')}</p>
               </button>
               <button
                 onClick={() => { onNavigate(Page.INSIGHTS); onClose(); }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.INSIGHTS ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.INSIGHTS ? 'bg-primary/20 text-primary font-bold' : 'text-muted hover:bg-border'}`}
               >
                 <span className="material-symbols-outlined">psychology</span>
                 <p className="text-sm">{t('cognitiveLab')}</p>
               </button>
               <button
                 onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MOVEMENT_ENGINE ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MOVEMENT_ENGINE ? 'bg-primary/20 text-primary font-bold' : 'text-muted hover:bg-border'}`}
               >
                 <span className="material-symbols-outlined">exercise</span>
                 <p className="text-sm">{t('movementEngine')}</p>
               </button>
               <button
                 onClick={() => { onNavigate(Page.MIND_GAMES); onClose(); }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MIND_GAMES ? 'bg-primary/20 text-primary font-bold' : 'text-[#92adc9] hover:bg-[#233648]'}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${currentPage === Page.MIND_GAMES ? 'bg-primary/20 text-primary font-bold' : 'text-muted hover:bg-border'}`}
               >
                 <span className="material-symbols-outlined">neurology</span>
                 <p className="text-sm">{t('mindGames')}</p>
@@ -189,7 +189,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
         <div className="mt-auto">
           <button
             onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
-            className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-12 font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95"
+            className="w-full bg-primary hover:bg-primary/90 text-content rounded-xl h-12 font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95"
           >
             <span className="material-symbols-outlined text-xl">play_circle</span>
             {t('startFlow')}

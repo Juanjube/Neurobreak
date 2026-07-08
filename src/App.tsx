@@ -201,7 +201,7 @@ const App: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-background-dark flex items-center justify-center text-white">Loading...</div>;
+    return <div className="min-h-screen bg-background flex items-center justify-center text-content">Loading...</div>;
   }
 
   if (!user) {
@@ -209,7 +209,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background-dark">
+    <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background">
       <Navbar
         user={user}
         onLogout={handleLogout}
@@ -229,7 +229,7 @@ const App: React.FC = () => {
           user={user}
         />
 
-        <main className="flex-1 flex flex-col bg-background-dark overflow-y-auto w-full pb-20 md:pb-0 relative">
+        <main className="flex-1 flex flex-col bg-background overflow-y-auto w-full pb-20 md:pb-0 relative">
           {currentPage === Page.DASHBOARD && user && (
             <Dashboard
               progress={user.progress}

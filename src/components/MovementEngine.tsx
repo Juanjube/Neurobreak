@@ -68,7 +68,7 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
   return (
     <div className="p-4 md:p-10 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col gap-2">
-        <h1 className="text-white text-4xl font-black leading-tight tracking-tight">{t('movementEngine')}</h1>
+        <h1 className="text-content text-4xl font-black leading-tight tracking-tight">{t('movementEngine')}</h1>
         <p className="text-[#92adc9] text-base">{t('movementEngineSubtitle')}</p>
       </div>
 
@@ -79,7 +79,7 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
             onClick={() => setFilter(cat.value)}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
               filter === cat.value 
-                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
+                ? 'bg-primary border-primary text-content shadow-lg shadow-primary/20' 
                 : 'border-[#233648] text-[#92adc9] hover:border-white/20'
             }`}
           >
@@ -98,7 +98,7 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
             }`}
           >
             <div className="flex justify-between items-start">
-              <div className={`size-12 rounded-xl flex items-center justify-center ${m.recommended ? 'bg-primary text-white' : 'bg-[#233648] text-primary'}`}>
+              <div className={`size-12 rounded-xl flex items-center justify-center ${m.recommended ? 'bg-primary text-content' : 'bg-[#233648] text-primary'}`}>
                 <span className="material-symbols-outlined text-2xl">{m.icon}</span>
               </div>
               <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase ${
@@ -111,7 +111,7 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
             </div>
 
             <div>
-              <h3 className="text-white font-bold text-lg group-hover:text-primary transition-colors">{m.title}</h3>
+              <h3 className="text-content font-bold text-lg group-hover:text-primary transition-colors">{m.title}</h3>
               <p className="text-[#92adc9] text-xs leading-relaxed mt-1">{m.description}</p>
             </div>
 
@@ -119,14 +119,14 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
               <div className="flex items-center gap-3">
                 <button 
                   onClick={(e) => handleInfo(e, m, 'why')}
-                  className={`text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1 ${explainingId === m.id && activeTab === 'why' ? 'bg-primary text-white shadow-sm' : 'text-primary hover:bg-primary/10'}`}
+                  className={`text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1 ${explainingId === m.id && activeTab === 'why' ? 'bg-primary text-content shadow-sm' : 'text-primary hover:bg-primary/10'}`}
                 >
                   <span className="material-symbols-outlined text-[12px]">science</span>
                   {t('why')}
                 </button>
                 <button 
                   onClick={(e) => handleInfo(e, m, 'how')}
-                  className={`text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1 ${explainingId === m.id && activeTab === 'how' ? 'bg-accent-teal text-white shadow-sm' : 'text-accent-teal hover:bg-accent-teal/10'}`}
+                  className={`text-[10px] font-bold px-2 py-1 rounded transition-colors flex items-center gap-1 ${explainingId === m.id && activeTab === 'how' ? 'bg-accent-teal text-content shadow-sm' : 'text-accent-teal hover:bg-accent-teal/10'}`}
                 >
                   <span className="material-symbols-outlined text-[12px]">play_lesson</span>
                   {t('how')}
@@ -136,12 +136,12 @@ const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, la
               {explainingId === m.id && (
                 <div className="p-3 bg-white/5 rounded-lg border border-white/10 animate-in slide-in-from-top-2">
                   {loading ? (
-                    <div className="flex items-center gap-2 text-[10px] text-white/50">
+                    <div className="flex items-center gap-2 text-[10px] text-content/50">
                       <div className="size-2 bg-primary rounded-full animate-pulse"></div>
                       {lang === 'es' ? 'Procesando...' : 'Processing...'}
                     </div>
                   ) : (
-                    <div className="text-[11px] text-white/80 leading-relaxed">
+                    <div className="text-[11px] text-content/80 leading-relaxed">
                       {activeTab === 'how' && Array.isArray(content) ? (
                         <ul className="list-decimal pl-4 space-y-1">
                           {content.map((step, i) => <li key={i}>{step}</li>)}

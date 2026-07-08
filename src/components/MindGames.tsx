@@ -181,12 +181,12 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
   return (
     <div className="p-4 md:p-10 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col gap-2">
-        <h1 className="text-white text-4xl font-black leading-tight tracking-tight">{t('mindGames')}</h1>
+        <h1 className="text-content text-4xl font-black leading-tight tracking-tight">{t('mindGames')}</h1>
         <p className="text-[#92adc9] text-base">{t('mindGamesSubtitle')}</p>
       </div>
 
       {resultMessage && (
-        <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-white">
+        <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-content">
           {resultMessage}
         </div>
       )}
@@ -206,18 +206,18 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
             <div className="rounded-2xl border border-primary/40 bg-primary/10 p-6 overflow-hidden relative">
               <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-start gap-4">
-                  <div className="size-14 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+                  <div className="size-14 rounded-xl bg-primary text-content flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-3xl">{recommendedGame.icon}</span>
                   </div>
                   <div>
                     <p className="text-primary text-xs font-black uppercase tracking-widest">{t('recommendedMindGame')}</p>
-                    <h2 className="text-white text-2xl font-black mt-1">{recommendedGame.title}</h2>
+                    <h2 className="text-content text-2xl font-black mt-1">{recommendedGame.title}</h2>
                     <p className="text-[#c4d3e2] text-sm leading-relaxed mt-2 max-w-2xl">{recommendedGame.description}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => startGame(recommendedGame)}
-                  className="h-12 px-5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 active:scale-95"
+                  className="h-12 px-5 rounded-xl bg-primary text-content text-sm font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 active:scale-95"
                 >
                   <span className="material-symbols-outlined text-xl">play_circle</span>
                   {t('playRecommended')}
@@ -230,11 +230,11 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
                 <div className="flex items-center justify-between gap-4 mb-6">
                   <div>
                     <p className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">{t('activeMindGame')}</p>
-                    <h2 className="text-white text-2xl font-bold">{activeGame.title}</h2>
+                    <h2 className="text-content text-2xl font-bold">{activeGame.title}</h2>
                   </div>
                   <button
                     onClick={() => setActiveGame(null)}
-                    className="size-10 rounded-xl bg-white/5 text-[#92adc9] hover:text-white hover:bg-white/10 flex items-center justify-center"
+                    className="size-10 rounded-xl bg-white/5 text-[#92adc9] hover:text-content hover:bg-white/10 flex items-center justify-center"
                     disabled={saving}
                   >
                     <span className="material-symbols-outlined">close</span>
@@ -257,11 +257,11 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
                     onClick={() => startGame(game)}
                     className="text-left bg-card-dark rounded-2xl border border-[#233648] p-5 flex flex-col gap-4 hover:border-primary hover:-translate-y-1 transition-all group"
                   >
-                    <div className="size-12 rounded-xl bg-[#233648] text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                    <div className="size-12 rounded-xl bg-[#233648] text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-content transition-colors">
                       <span className="material-symbols-outlined text-2xl">{game.icon}</span>
                     </div>
                     <div>
-                      <h3 className="text-white font-bold text-lg">{game.title}</h3>
+                      <h3 className="text-content font-bold text-lg">{game.title}</h3>
                       <p className="text-[#92adc9] text-xs leading-relaxed mt-1">{game.description}</p>
                     </div>
                     <div className="mt-auto pt-4 border-t border-[#233648] flex items-center justify-between">
@@ -278,11 +278,11 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
             <div className="flex items-center justify-between gap-3 mb-5">
               <div>
                 <p className="text-[#92adc9] text-xs font-bold uppercase tracking-widest">{t('mindGameHistory')}</p>
-                <h2 className="text-white text-xl font-bold">{t('recentGames')}</h2>
+                <h2 className="text-content text-xl font-bold">{t('recentGames')}</h2>
               </div>
               <button
                 onClick={startAnother}
-                className="size-10 rounded-xl bg-primary/20 text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center"
+                className="size-10 rounded-xl bg-primary/20 text-primary hover:bg-primary hover:text-content transition-colors flex items-center justify-center"
               >
                 <span className="material-symbols-outlined">shuffle</span>
               </button>
@@ -297,7 +297,7 @@ const MindGames: React.FC<MindGamesProps> = ({ user, onCompleteGame, t, lang }) 
               {history.slice(0, 6).map(session => (
                 <div key={session.id} className="rounded-xl border border-[#324d67] bg-white/5 p-3">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-white text-sm font-bold truncate">{getGameTitle(session.game_id)}</p>
+                    <p className="text-content text-sm font-bold truncate">{getGameTitle(session.game_id)}</p>
                     <span className="text-accent-teal text-xs font-bold">{scoreText(session.score)}</span>
                   </div>
                   <div className="flex items-center justify-between mt-2 text-[11px] text-[#92adc9]">
@@ -329,18 +329,18 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({ result, onRepeat, o
       <span className="material-symbols-outlined text-4xl">auto_awesome</span>
     </div>
     <p className="text-[#92adc9] text-xs font-black uppercase tracking-[0.28em]">{t('sessionComplete')}</p>
-    <h2 className="text-white text-3xl md:text-5xl font-black mt-3 max-w-3xl">{result.game.title}</h2>
+    <h2 className="text-content text-3xl md:text-5xl font-black mt-3 max-w-3xl">{result.game.title}</h2>
     <p className="text-accent-cyan text-lg md:text-xl leading-relaxed mt-8 max-w-2xl">"{result.quote}"</p>
     <p className="text-[#92adc9] text-sm leading-relaxed mt-5 max-w-xl">{result.summary}</p>
 
     <div className="grid grid-cols-2 gap-4 mt-8 w-full max-w-md">
       <div className="rounded-xl bg-white/5 border border-[#233648] p-4">
         <p className="text-[#92adc9] text-xs uppercase font-bold">{t('score')}</p>
-        <p className="text-white text-2xl font-black mt-1">{scoreText(result.score)}</p>
+        <p className="text-content text-2xl font-black mt-1">{scoreText(result.score)}</p>
       </div>
       <div className="rounded-xl bg-white/5 border border-[#233648] p-4">
         <p className="text-[#92adc9] text-xs uppercase font-bold">{t('duration')}</p>
-        <p className="text-white text-2xl font-black mt-1">{formatDuration(result.duration, lang)}</p>
+        <p className="text-content text-2xl font-black mt-1">{formatDuration(result.duration, lang)}</p>
       </div>
     </div>
 
@@ -348,10 +348,10 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({ result, onRepeat, o
       <button onClick={onBack} className="h-12 flex-1 rounded-xl bg-white/5 text-[#c4d3e2] text-sm font-bold hover:bg-white/10 transition-colors">
         {t('backToGames')}
       </button>
-      <button onClick={onRepeat} className="h-12 flex-1 rounded-xl bg-[#233648] text-white text-sm font-bold hover:bg-[#2d455c] transition-colors">
+      <button onClick={onRepeat} className="h-12 flex-1 rounded-xl bg-[#233648] text-content text-sm font-bold hover:bg-[#2d455c] transition-colors">
         {t('repeatGame')}
       </button>
-      <button onClick={onAnother} className="h-12 flex-1 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors">
+      <button onClick={onAnother} className="h-12 flex-1 rounded-xl bg-primary text-content text-sm font-bold hover:bg-primary/90 transition-colors">
         {t('playAnother')}
       </button>
     </div>
@@ -620,7 +620,7 @@ const FocusBreathingGame: React.FC<Omit<GameRunnerProps, 'game' | 'seed'>> = ({ 
           className="size-44 rounded-full bg-primary/30 border border-primary/70 flex items-center justify-center shadow-2xl shadow-primary/20 transition-transform duration-[3800ms] ease-in-out"
           style={{ transform: `scale(${phase.scale})` }}
         >
-          <span className="text-white text-xl font-black">{phase.label}</span>
+          <span className="text-content text-xl font-black">{phase.label}</span>
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest">
@@ -630,7 +630,7 @@ const FocusBreathingGame: React.FC<Omit<GameRunnerProps, 'game' | 'seed'>> = ({ 
       <button
         disabled={saving}
         onClick={finish}
-        className="h-11 px-5 rounded-xl bg-accent-teal text-white text-sm font-bold hover:bg-accent-teal/90 transition-colors"
+        className="h-11 px-5 rounded-xl bg-accent-teal text-content text-sm font-bold hover:bg-accent-teal/90 transition-colors"
       >
         {t('finishMindGame')}
       </button>

@@ -65,7 +65,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
       <div className="lg:col-span-8 flex flex-col gap-6">
         <button 
           onClick={onBack}
-          className="flex items-center gap-2 text-[#92adc9] hover:text-white transition-colors text-sm font-bold w-fit"
+          className="flex items-center gap-2 text-[#92adc9] hover:text-content transition-colors text-sm font-bold w-fit"
         >
           <span className="material-symbols-outlined">arrow_back</span>
           {t('abortMission')}
@@ -76,8 +76,8 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
             <span className="material-symbols-outlined text-xs">settings_accessibility</span>
             {movement.category} {isActive ? t('inProgress').toUpperCase() : 'ACTIVE'}
           </div>
-          <h1 className="text-white text-4xl lg:text-5xl font-bold leading-tight">{movement.title}</h1>
-          <p className="text-white/60 text-lg">{movement.description}</p>
+          <h1 className="text-content text-4xl lg:text-5xl font-bold leading-tight">{movement.title}</h1>
+          <p className="text-content/60 text-lg">{movement.description}</p>
         </div>
 
         <div className="glass-panel p-2 rounded-2xl shadow-2xl relative group overflow-hidden">
@@ -92,7 +92,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
               {!isActive && !isFinished && (
                 <button 
                   onClick={startSession}
-                  className="size-24 rounded-full bg-primary text-white shadow-2xl hover:scale-110 transition-transform flex items-center justify-center"
+                  className="size-24 rounded-full bg-primary text-content shadow-2xl hover:scale-110 transition-transform flex items-center justify-center"
                 >
                   <span className="material-symbols-outlined !text-5xl">play_arrow</span>
                 </button>
@@ -100,7 +100,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
               
               {(isActive || isFinished) && (
                 <div className="text-center">
-                  <div className="text-7xl font-black text-white tabular-nums drop-shadow-2xl">
+                  <div className="text-7xl font-black text-content tabular-nums drop-shadow-2xl">
                     {formatTime(timeLeft)}
                   </div>
                   {isFinished && (
@@ -128,7 +128,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
         <div className="glass-panel p-8 rounded-2xl border-l-4 border-l-primary">
           <div className="flex items-center gap-3 mb-6">
             <span className="material-symbols-outlined text-primary">psychology</span>
-            <h3 className="text-xl font-bold text-white">{t('coachGuidance')}: {t('howToPerform')}</h3>
+            <h3 className="text-xl font-bold text-content">{t('coachGuidance')}: {t('howToPerform')}</h3>
           </div>
           
           {loadingCoach ? (
@@ -141,10 +141,10 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {instructions.map((step, idx) => (
                 <div key={idx} className="flex flex-col gap-3 group">
-                  <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 group-hover:bg-primary group-hover:text-white transition-all">
+                  <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 group-hover:bg-primary group-hover:text-content transition-all">
                     {idx + 1}
                   </div>
-                  <p className="text-white/80 text-sm leading-relaxed">{step}</p>
+                  <p className="text-content/80 text-sm leading-relaxed">{step}</p>
                 </div>
               ))}
             </div>
@@ -155,8 +155,8 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
       <div className="lg:col-span-4 flex flex-col gap-6 sticky top-24">
         <div className="glass-panel p-8 rounded-2xl flex flex-col gap-6">
           <div className="space-y-1">
-            <h2 className="text-white text-2xl font-bold">{t('sessionState')}</h2>
-            <p className="text-white/50 text-sm">
+            <h2 className="text-content text-2xl font-bold">{t('sessionState')}</h2>
+            <p className="text-content/50 text-sm">
               {isActive ? t('modulatingWaves') : t('waitingTrigger')}
             </p>
           </div>
@@ -164,16 +164,16 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
           <div className="p-4 bg-white/5 rounded-xl border border-white/10">
             <div className="flex items-center gap-3 mb-2">
               <span className="material-symbols-outlined text-accent-cyan">neurology</span>
-              <span className="text-xs font-bold text-white">{t('targetMetric')}</span>
+              <span className="text-xs font-bold text-content">{t('targetMetric')}</span>
             </div>
-            <p className="text-sm text-white/80 italic">{t('neuroBenefitLabel')}: "{movement.neuroBenefit}"</p>
+            <p className="text-sm text-content/80 italic">{t('neuroBenefitLabel')}: "{movement.neuroBenefit}"</p>
           </div>
 
           {!isFinished ? (
             <button 
               disabled={isActive}
               onClick={startSession}
-              className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all ${isActive ? 'bg-[#233648] text-[#92adc9] cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-white active:scale-95'}`}
+              className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all ${isActive ? 'bg-[#233648] text-[#92adc9] cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-content active:scale-95'}`}
             >
               {isActive ? t('inProgress') : t('startSession')}
             </button>
@@ -189,7 +189,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
         
         <div className="p-6 bg-accent-cyan/10 border border-accent-cyan/20 rounded-2xl">
           <h4 className="text-accent-cyan text-xs font-bold uppercase tracking-widest mb-3">{t('bioSafetyTip')}</h4>
-          <p className="text-white/70 text-xs leading-relaxed">
+          <p className="text-content/70 text-xs leading-relaxed">
             {t('safetyWarning')}
           </p>
         </div>

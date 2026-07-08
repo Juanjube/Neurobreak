@@ -60,7 +60,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
             <span className="material-symbols-outlined text-base">tune</span>
             NeuroBreak Control
           </div>
-          <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">{t('settings')}</h1>
+          <h1 className="text-content text-3xl md:text-4xl font-black leading-tight tracking-tight">{t('settings')}</h1>
           <p className="text-[#92adc9] text-sm md:text-base max-w-2xl">
             {isSpanish
               ? 'Ajusta tu identidad, preferencias y objetivo de bienestar sin salir del flujo.'
@@ -71,15 +71,15 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
         <div className="grid grid-cols-3 gap-3 min-w-full sm:min-w-[360px]">
           <div className="rounded-lg border border-[#233648] bg-card-dark p-3">
             <p className="text-[#92adc9] text-xs font-bold uppercase">{t('mentalClarity')}</p>
-            <p className="text-white text-xl font-black">{formData.progress.mentalClarity.toFixed(1)}</p>
+            <p className="text-content text-xl font-black">{formData.progress.mentalClarity.toFixed(1)}</p>
           </div>
           <div className="rounded-lg border border-[#233648] bg-card-dark p-3">
             <p className="text-[#92adc9] text-xs font-bold uppercase">{t('backHealth')}</p>
-            <p className="text-white text-xl font-black">{formData.progress.backHealth}%</p>
+            <p className="text-content text-xl font-black">{formData.progress.backHealth}%</p>
           </div>
           <div className="rounded-lg border border-[#233648] bg-card-dark p-3">
             <p className="text-[#92adc9] text-xs font-bold uppercase">{isSpanish ? 'Sesiones' : 'Sessions'}</p>
-            <p className="text-white text-xl font-black">{formData.progress.sessionsCompleted}</p>
+            <p className="text-content text-xl font-black">{formData.progress.sessionsCompleted}</p>
           </div>
         </div>
       </div>
@@ -97,7 +97,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                 }}
               />
             </div>
-            <h2 className="mt-4 text-white font-black text-xl break-words">{formData.name}</h2>
+            <h2 className="mt-4 text-content font-black text-xl break-words">{formData.name}</h2>
             <p className="text-[#92adc9] text-sm break-all">{formData.email}</p>
           </div>
 
@@ -109,7 +109,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                 onClick={() => setFormData(prev => ({ ...prev, goal: option.value }))}
                 className={`w-full cursor-pointer rounded-lg border p-3 text-left transition-colors duration-200 ${
                   formData.goal === option.value
-                    ? 'border-primary bg-primary/15 text-white'
+                    ? 'border-primary bg-primary/15 text-content'
                     : 'border-[#233648] text-[#92adc9] hover:border-primary/60 hover:bg-[#233648]/70'
                 }`}
               >
@@ -126,7 +126,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
           <section className="rounded-lg border border-[#233648] bg-card-dark overflow-hidden">
             <div className="p-5 border-b border-[#233648] flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-white font-bold text-lg">{t('account')}</h2>
+                <h2 className="text-content font-bold text-lg">{t('account')}</h2>
                 <p className="text-[#92adc9] text-sm">{isSpanish ? 'Datos visibles de tu perfil.' : 'Visible profile details.'}</p>
               </div>
               <span className="material-symbols-outlined text-primary">person</span>
@@ -141,7 +141,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                   value={formData.name}
                   onChange={handleChange}
                   maxLength={80}
-                  className="bg-[#233648] border border-transparent rounded-lg text-white focus:border-primary focus:ring-primary h-12 px-4"
+                  className="bg-[#233648] border border-transparent rounded-lg text-content focus:border-primary focus:ring-primary h-12 px-4"
                 />
               </label>
 
@@ -165,7 +165,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                   onChange={handleChange}
                   maxLength={2048}
                   placeholder="https://example.com/avatar.jpg"
-                  className="bg-[#233648] border border-transparent rounded-lg text-white focus:border-primary focus:ring-primary h-12 px-4"
+                  className="bg-[#233648] border border-transparent rounded-lg text-content focus:border-primary focus:ring-primary h-12 px-4"
                 />
               </label>
             </div>
@@ -174,7 +174,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
           <section className="rounded-lg border border-[#233648] bg-card-dark overflow-hidden">
             <div className="p-5 border-b border-[#233648] flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-white font-bold text-lg">{t('preferences')}</h2>
+                <h2 className="text-content font-bold text-lg">{t('preferences')}</h2>
                 <p className="text-[#92adc9] text-sm">{isSpanish ? 'Idioma y experiencia principal.' : 'Language and primary experience.'}</p>
               </div>
               <span className="material-symbols-outlined text-accent-cyan">settings_accessibility</span>
@@ -187,14 +187,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, language: 'en' }))}
-                    className={`cursor-pointer h-12 rounded-lg font-bold transition-colors border ${formData.language === 'en' ? 'bg-primary border-primary text-white' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
+                    className={`cursor-pointer h-12 rounded-lg font-bold transition-colors border ${formData.language === 'en' ? 'bg-primary border-primary text-content' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
                   >
                     English
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, language: 'es' }))}
-                    className={`cursor-pointer h-12 rounded-lg font-bold transition-colors border ${formData.language === 'es' ? 'bg-primary border-primary text-white' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
+                    className={`cursor-pointer h-12 rounded-lg font-bold transition-colors border ${formData.language === 'es' ? 'bg-primary border-primary text-content' : 'border-[#233648] text-[#92adc9] hover:bg-[#233648]'}`}
                   >
                     Español
                   </button>
@@ -207,7 +207,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
                   name="goal"
                   value={formData.goal}
                   onChange={handleChange}
-                  className="bg-[#233648] border border-transparent rounded-lg text-white focus:border-primary focus:ring-primary h-12 px-4"
+                  className="bg-[#233648] border border-transparent rounded-lg text-content focus:border-primary focus:ring-primary h-12 px-4"
                 >
                   {goalOptions.map(option => (
                     <option key={option.value} value={option.value} className="bg-[#101922]">
@@ -228,7 +228,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateUser, t
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <button
               type="submit"
-              className="cursor-pointer bg-primary hover:bg-primary/90 text-white px-6 h-12 rounded-lg font-bold transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+              className="cursor-pointer bg-primary hover:bg-primary/90 text-content px-6 h-12 rounded-lg font-bold transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined">save</span>
               {t('saveChanges')}

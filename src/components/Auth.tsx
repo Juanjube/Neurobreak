@@ -73,7 +73,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   if (!isLogin) {
     return (
-      <div className="min-h-[100dvh] bg-[#080B0E] text-white font-sans relative flex lg:flex-row flex-col">
+      <div className="min-h-[100dvh] bg-[#080B0E] text-content font-sans relative flex lg:flex-row flex-col">
         {/* Global Header */}
         <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-10 pointer-events-none">
           <div className="flex items-center gap-3">
@@ -84,7 +84,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <div className="relative">
               <button
                 type="button"
-                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-medium transition-colors text-white/80 px-4 py-1.5"
+                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-medium transition-colors text-content/80 px-4 py-1.5"
                 onClick={() => setIsLangOpen(!isLangOpen)}
               >
                 <span className={`fi fi-${language === 'en' ? 'us' : 'es'}`}></span>
@@ -92,7 +92,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 <span className="material-symbols-outlined text-[16px] ml-1">expand_more</span>
               </button>
               {isLangOpen && (
-                <div className="absolute top-full mt-2 left-0 min-w-[100px] bg-[#233648] border border-white/10 rounded-xl overflow-hidden shadow-xl z-50">
+                <div className="absolute top-full mt-2 left-0 min-w-[100px] bg-border border border-white/10 rounded-xl overflow-hidden shadow-xl z-50">
                   <button
                     className="flex items-center gap-3 w-full px-4 py-2 text-left hover:bg-white/5 transition-colors"
                     onClick={() => { setLanguage('en'); setIsLangOpen(false); }}
@@ -108,7 +108,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 </div>
               )}
             </div>
-            <span className="text-white/60 hidden sm:inline">
+            <span className="text-content/60 hidden sm:inline">
               {language === 'en' ? 'Already have an account?' : '¿Ya tienes una cuenta?'}
             </span>
             <button
@@ -133,7 +133,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 {language === 'en' ? 'Live Sanctuary' : 'Santuario en Vivo'}
               </div>
 
-              <div className="bg-[#233648]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mt-auto">
+              <div className="bg-border/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mt-auto">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-full bg-[#00E5FF]/20 flex items-center justify-center text-[#00E5FF]">
                     <span className="material-symbols-outlined text-lg">psychology</span>
@@ -142,7 +142,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     {language === 'en' ? 'Personalized Refuge' : 'Refugio Personalizado'}
                   </h3>
                 </div>
-                <p className="text-[#92adc9] text-sm leading-relaxed">
+                <p className="text-muted text-sm leading-relaxed">
                   {language === 'en'
                     ? 'Discover a workspace that adapts to your cognitive rhythms, ensuring peak flow and sustained well-being.'
                     : 'Descubre un espacio de trabajo que se adapta a tus ritmos cognitivos, asegurando un estado de flujo máximo y bienestar sostenido.'}
@@ -150,7 +150,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </div>
             </div>
             <div className="mt-8 px-4">
-              <p className="text-[#92adc9] text-xs font-bold tracking-widest uppercase mb-2">
+              <p className="text-muted text-xs font-bold tracking-widest uppercase mb-2">
                 {language === 'en' ? 'The Neurobreak Philosophy' : 'La Filosofía Neurobreak'}
               </p>
               <p className="text-xl font-medium">
@@ -170,51 +170,51 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             )}
 
             <h1 className="text-4xl font-bold mb-3">{t('joinSanctuary')}</h1>
-            <p className="text-[#92adc9] mb-10">{t('yourGateway')}</p>
+            <p className="text-muted mb-10">{t('yourGateway')}</p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex flex-col gap-2 flex-1">
-                  <label className="text-xs font-bold text-white/70 tracking-wider uppercase">{t('fullName')}</label>
+                  <label className="text-xs font-bold text-content/70 tracking-wider uppercase">{t('fullName')}</label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     maxLength={80}
-                    className="bg-transparent border border-[#233648] rounded-xl text-white placeholder:text-white/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 transition-colors"
+                    className="bg-transparent border border-border rounded-xl text-content placeholder:text-content/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 transition-colors"
                     placeholder={language === 'en' ? "Name" : "Nombre"}
                   />
                 </div>
                 <div className="flex flex-col gap-2 flex-1">
-                  <label className="text-xs font-bold text-white/70 tracking-wider uppercase">{t('email')}</label>
+                  <label className="text-xs font-bold text-content/70 tracking-wider uppercase">{t('email')}</label>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-transparent border border-[#233648] rounded-xl text-white placeholder:text-white/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 transition-colors"
+                    className="bg-transparent border border-border rounded-xl text-content placeholder:text-content/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 transition-colors"
                     placeholder={language === 'en' ? "Email" : "Correo electrónico"}
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-white/70 tracking-wider uppercase">{t('password')}</label>
+                <label className="text-xs font-bold text-content/70 tracking-wider uppercase">{t('password')}</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-transparent border border-[#233648] rounded-xl text-white placeholder:text-white/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full pr-12 transition-colors"
+                    className="bg-transparent border border-border rounded-xl text-content placeholder:text-content/20 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full pr-12 transition-colors"
                     placeholder={language === 'en' ? "Password" : "Contraseña"}
                     minLength={8}
                     maxLength={128}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-white/40 hover:text-white transition-colors"
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-content/40 hover:text-content transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     <span className="material-symbols-outlined text-[20px]">
@@ -225,19 +225,19 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-white/70 tracking-wider uppercase">{t('authGoal')}</label>
+                <label className="text-xs font-bold text-content/70 tracking-wider uppercase">{t('authGoal')}</label>
                 <div className="relative">
                   <select
                     value={goal}
                     onChange={(e) => setGoal(e.target.value as keyof typeof translations['en'])}
-                    className="bg-transparent border border-[#233648] rounded-xl text-white focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full appearance-none transition-colors"
+                    className="bg-transparent border border-border rounded-xl text-content focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full appearance-none transition-colors"
                   >
                     <option value="goalDeepWork" className="bg-[#080B0E]">{t('goalDeepWork')}</option>
                     <option value="goalCreativeFlow" className="bg-[#080B0E]">{t('goalCreativeFlow')}</option>
                     <option value="goalSpinalRecovery" className="bg-[#080B0E]">{t('goalSpinalRecovery')}</option>
                     <option value="goalVagusNerve" className="bg-[#080B0E]">{t('goalVagusNerve')}</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white/40">
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-content/40">
                     <span className="material-symbols-outlined text-[20px]">expand_more</span>
                   </div>
                 </div>
@@ -256,7 +256,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[#233648]"></div>
               </div>
-              <div className="relative flex justify-center text-xs font-bold tracking-widest text-white/40 uppercase">
+              <div className="relative flex justify-center text-xs font-bold tracking-widest text-content/40 uppercase">
                 <span className="px-4 bg-[#080B0E]">{t('orContinueWith')}</span>
               </div>
             </div>
@@ -270,8 +270,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               {t('continueWithGoogle')}
             </button>
 
-            <p className="text-white/40 text-xs text-center mt-8">
-              {t('termsText')} <a href="#" className="text-white/60 hover:text-white underline decoration-white/30 underline-offset-2">Terms of Service</a> {language === 'en' ? 'and' : 'y'} <a href="#" className="text-white/60 hover:text-white underline decoration-white/30 underline-offset-2">Privacy Policy</a>.
+            <p className="text-content/40 text-xs text-center mt-8">
+              {t('termsText')} <a href="#" className="text-content/60 hover:text-content underline decoration-white/30 underline-offset-2">Terms of Service</a> {language === 'en' ? 'and' : 'y'} <a href="#" className="text-content/60 hover:text-content underline decoration-white/30 underline-offset-2">Privacy Policy</a>.
             </p>
           </div>
         </div>
@@ -281,12 +281,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
   // Login View (Unchanged from original)
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-background-dark p-4 overflow-y-auto relative">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-background p-4 overflow-y-auto relative">
       <div className="absolute top-4 right-4 flex gap-2 z-10 w-auto">
         <div className="relative">
           <button
             type="button"
-            className="flex items-center gap-2 bg-[#233648] hover:bg-[#233648]/80 border border-white/10 rounded-full font-medium transition-colors text-white/80 px-4 py-1.5 text-sm"
+            className="flex items-center gap-2 bg-[#233648] hover:bg-border/80 border border-white/10 rounded-full font-medium transition-colors text-content/80 px-4 py-1.5 text-sm"
             onClick={() => setIsLangOpen(!isLangOpen)}
           >
             <span className={`fi fi-${language === 'en' ? 'us' : 'es'}`}></span>
@@ -311,7 +311,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           )}
         </div>
       </div>
-      <div className="w-full max-w-sm bg-card-dark border border-white/10 p-6 rounded-2xl shadow-2xl my-auto shrink-0 mt-16 sm:mt-auto relative z-20">
+      <div className="w-full max-w-sm bg-surface border border-white/10 p-6 rounded-2xl shadow-2xl my-auto shrink-0 mt-16 sm:mt-auto relative z-20">
         <div className="flex flex-col items-center gap-3 mb-6">
           <img src="/Logo.jpg" alt="NeuroBreak Logo" className="size-24 rounded-2xl object-cover" />
           <h1 className="text-2xl font-bold tracking-tight">NeuroBreak AI</h1>
@@ -338,7 +338,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary"
+              className="bg-[#233648] border-none rounded-xl text-content placeholder:text-content/20 focus:ring-primary"
               placeholder="neuro@science.com"
             />
           </div>
@@ -350,14 +350,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-[#233648] border-none rounded-xl text-white placeholder:text-white/20 focus:ring-primary w-full pr-10"
+                className="bg-[#233648] border-none rounded-xl text-content placeholder:text-content/20 focus:ring-primary w-full pr-10"
                 placeholder="••••••••"
                 minLength={8}
                 maxLength={128}
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#92adc9] hover:text-white"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#92adc9] hover:text-content"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <span className="material-symbols-outlined text-sm">
@@ -370,7 +370,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white h-11 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-primary hover:bg-primary/90 text-content h-11 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -385,14 +385,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <div className="w-full border-t border-[#233648]"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-card-dark text-[#92adc9]">{t('orContinueWith')}</span>
+            <span className="px-2 bg-surface text-[#92adc9]">{t('orContinueWith')}</span>
           </div>
         </div>
 
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white/5 hover:bg-white/10 text-white border border-[#233648] h-11 rounded-xl font-bold transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-white/5 hover:bg-white/10 text-content border border-[#233648] h-11 rounded-xl font-bold transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="size-5" />
           {t('continueWithGoogle')}
@@ -405,7 +405,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               setError(null);
               setInfoMessage(null);
             }}
-            className="text-sm text-[#92adc9] hover:text-white transition-colors"
+            className="text-sm text-[#92adc9] hover:text-content transition-colors"
           >
             {t('dontHaveAccount')}
           </button>
