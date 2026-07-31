@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Page, User, Language, Movement, MindGame } from './types';
+import { Page, User, Language, Movement, MindGame, MindGameSession } from './types';
 import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
 import MovementEngine from './components/MovementEngine';
@@ -8,19 +7,30 @@ import MindGames from './components/MindGames';
 import Ritual from './components/Ritual';
 import Insights from './components/Insights';
 import ProfileSettings from './components/ProfileSettings';
+import Profile from './components/Profile';
 import AIChatButton from './components/AIChatButton';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
-import { supabase, getProfile, signOut, updateProfile, logSession } from './services/supabase';
+import { supabase, getProfile, signOut, updateProfile, logSession, getSessionHistory, getMindGameHistory } from './services/supabase';
+import { calculateWellnessMetrics, PhysicalSession } from './utils/wellnessMetrics';
+import { useAppSession } from './hooks/useAppSession';
 import "flag-icons/css/flag-icons.min.css";
 
 const App: React.FC = () => {
-  // currentPage guarda la vista actual en la que se encuentra el usuario (ej: Dashboard, Login, etc.)
-  const [currentPage, setCurrentPage] = useState<Page>(Page.LOGIN);
-
   // user almacena los datos del usuario logueado. Si es null, el usuario no ha iniciado sesión.
   const [user, setUser] = useState<User | null>(null);
+
+  // Hook global de sesión para manejar navegación, scroll y filtros de forma agnóstica
+  const appSession = useAppSession(user, Page.DASHBOARD);
+  const {
+    currentPage,
+    setCurrentPage,
+    setPageFilter,
+    getPageFilter,
+    isRestored,
+    mainContainerRef,
+  } = appSession;
 
   // activeMovement guarda el ejercicio o movimiento seleccionado actualmente para realizar
   const [activeMovement, setActiveMovement] = useState<Movement | null>(null);
@@ -30,6 +40,10 @@ const App: React.FC = () => {
 
   // mobileMenuOpen controla si el menú lateral (Sidebar) está abierto o cerrado en dispositivos móviles
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [physicalHistory, setPhysicalHistory] = useState<PhysicalSession[]>([]);
+  const [mentalHistory, setMentalHistory] = useState<MindGameSession[]>([]);
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [metricsError, setMetricsError] = useState(false);
 
   useEffect(() => {
     // Al cargar la app, comprobamos si ya hay una sesión activa guardada en Supabase
@@ -62,6 +76,42 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // The histories are loaded once here so every surface consumes the same
+  // calculated wellness state instead of producing independent diagnoses.
+  useEffect(() => {
+    if (!user) {
+      setPhysicalHistory([]);
+      setMentalHistory([]);
+      return;
+    }
+
+    let isCurrent = true;
+    const loadWellnessHistory = async () => {
+      setMetricsLoading(true);
+      setMetricsError(false);
+      try {
+        const [physicalResult, mentalResult] = await Promise.all([
+          getSessionHistory(user.id),
+          getMindGameHistory(user.id, 20),
+        ]);
+        if (physicalResult.error) throw physicalResult.error;
+        if (mentalResult.error) throw mentalResult.error;
+        if (isCurrent) {
+          setPhysicalHistory((physicalResult.data || []) as PhysicalSession[]);
+          setMentalHistory((mentalResult.data || []) as MindGameSession[]);
+        }
+      } catch (error) {
+        console.error('Error loading wellness history:', error);
+        if (isCurrent) setMetricsError(true);
+      } finally {
+        if (isCurrent) setMetricsLoading(false);
+      }
+    };
+
+    loadWellnessHistory();
+    return () => { isCurrent = false; };
+  }, [user?.id, user?.progress.sessionsCompleted, user?.progress.mentalClarity, user?.progress.backHealth]);
+
   const fetchProfile = async (userId: string, email: string) => {
     try {
       const { data, error } = await getProfile(userId);
@@ -87,7 +137,6 @@ const App: React.FC = () => {
           }
         };
         setUser(userData);
-        setCurrentPage(Page.DASHBOARD);
       }
     } catch (err) {
       console.error('Unexpected error fetching profile:', err);
@@ -101,15 +150,9 @@ const App: React.FC = () => {
     return translations[lang][key] || key;
   };
 
-  // Deprecated: Auth component now handles login internally via Supabase, 
-  // and App listens to the state change. 
-  // Keeping this as a placeholder/type satisfier if needed for Auth component prop, 
-  // but Auth component doesn't strictly depend on it for logic anymore.
-  const handleLogin = (userData: User) => {
+  const handleLogin = (_userData: User) => {
     // This flow is replaced by onAuthStateChange
   };
-
-
 
   const handleUpdateUser = async (updatedUser: User) => {
     if (!user) return;
@@ -123,10 +166,8 @@ const App: React.FC = () => {
     }
   };
 
-
   const handleLogout = async () => {
     await signOut();
-    // onAuthStateChange will handle state updates
   };
 
   const handleSelectMovement = (m: Movement) => {
@@ -137,13 +178,10 @@ const App: React.FC = () => {
   const handleSessionComplete = async () => {
     if (!user) return;
 
-    // Increment stats
-    const newClarity = Math.min(10, user.progress.mentalClarity + 0.3); // Scale is 1-10 based on Insights? App says 1-5? Let's assume 10 max based on valid range.
-    // wait, initial default was 3.2. Insights mapped 10. Let's aim for 10.
+    const newClarity = Math.min(10, user.progress.mentalClarity + 0.3);
     const newBack = Math.min(100, user.progress.backHealth + 5);
     const newSessions = user.progress.sessionsCompleted + 1;
 
-    // Optimistic update
     const updatedUser = {
       ...user,
       progress: {
@@ -156,16 +194,13 @@ const App: React.FC = () => {
     setUser(updatedUser);
     setCurrentPage(Page.DASHBOARD);
 
-    // Persist to Supabase
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // Update profile stats
         await updateProfile(session.user.id, {
           progress: updatedUser.progress
         });
 
-        // Log session history
         if (activeMovement) {
           await logSession(session.user.id, activeMovement.id, activeMovement.durationSeconds);
         }
@@ -208,6 +243,8 @@ const App: React.FC = () => {
     return <Auth onLogin={handleLogin} />;
   }
 
+  const wellnessMetrics = calculateWellnessMetrics(user, physicalHistory, mentalHistory);
+
   return (
     <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background">
       <Navbar
@@ -216,6 +253,7 @@ const App: React.FC = () => {
         onNavigate={setCurrentPage}
         currentPage={currentPage}
         t={t}
+        cognitiveState={wellnessMetrics.cognitiveState}
         onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
@@ -226,13 +264,16 @@ const App: React.FC = () => {
           t={t}
           isOpen={mobileMenuOpen}
           onClose={() => setMobileMenuOpen(false)}
-          user={user}
+          metrics={wellnessMetrics}
+          metricsLoading={metricsLoading}
+          metricsError={metricsError}
         />
 
-        <main className="flex-1 flex flex-col bg-background overflow-y-auto w-full pb-20 md:pb-0 relative">
+        <main ref={mainContainerRef as React.RefObject<HTMLDivElement>} className="flex-1 flex flex-col bg-background overflow-y-auto w-full pb-20 md:pb-0 relative">
           {currentPage === Page.DASHBOARD && user && (
             <Dashboard
               progress={user.progress}
+              wellnessMetrics={wellnessMetrics}
               onStartRitual={() => setCurrentPage(Page.MOVEMENT_ENGINE)}
               t={t}
               lang={user.language}
@@ -243,6 +284,8 @@ const App: React.FC = () => {
               onSelectMovement={handleSelectMovement}
               t={t}
               lang={user.language}
+              categoryFilter={getPageFilter(Page.MOVEMENT_ENGINE, 'category', 'All')}
+              onCategoryFilterChange={(cat) => setPageFilter(Page.MOVEMENT_ENGINE, 'category', cat)}
             />
           )}
           {currentPage === Page.MIND_GAMES && user && (
@@ -251,6 +294,8 @@ const App: React.FC = () => {
               onCompleteGame={handleMindGameComplete}
               t={t}
               lang={user.language}
+              categoryFilter={getPageFilter(Page.MIND_GAMES, 'category', 'All')}
+              onCategoryFilterChange={(cat) => setPageFilter(Page.MIND_GAMES, 'category', cat)}
             />
           )}
           {currentPage === Page.RITUAL && user && (
@@ -274,6 +319,12 @@ const App: React.FC = () => {
               user={user}
               onUpdateUser={handleUpdateUser}
               t={t}
+            />
+          )}
+          {currentPage === Page.PROFILE && user && (
+            <Profile
+              user={user}
+              onOpenSettings={() => setCurrentPage(Page.SETTINGS)}
             />
           )}
         </main>

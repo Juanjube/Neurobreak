@@ -8,10 +8,26 @@ interface MovementEngineProps {
   onSelectMovement: (m: Movement) => void;
   t: (key: any) => string;
   lang: string;
+  categoryFilter?: MovementCategory | 'All';
+  onCategoryFilterChange?: (cat: MovementCategory | 'All') => void;
 }
 
-const MovementEngine: React.FC<MovementEngineProps> = ({ onSelectMovement, t, lang }) => {
-  const [filter, setFilter] = useState<MovementCategory | 'All'>('All');
+const MovementEngine: React.FC<MovementEngineProps> = ({
+  onSelectMovement,
+  t,
+  lang,
+  categoryFilter,
+  onCategoryFilterChange,
+}) => {
+  const [localFilter, setLocalFilter] = useState<MovementCategory | 'All'>('All');
+  const filter = categoryFilter !== undefined ? categoryFilter : localFilter;
+  const setFilter = (cat: MovementCategory | 'All') => {
+    if (onCategoryFilterChange) {
+      onCategoryFilterChange(cat);
+    } else {
+      setLocalFilter(cat);
+    }
+  };
   const [explainingId, setExplainingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'why' | 'how'>('why');
   const [content, setContent] = useState<any>(null);

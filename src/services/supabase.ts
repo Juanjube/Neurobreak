@@ -70,6 +70,13 @@ export const signOut = async () => {
   return { error };
 };
 
+export const requestPasswordReset = async (email: string) => {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}`,
+  });
+  return { data, error };
+};
+
 export const getProfile = async (userId: string) => {
   const currentUserId = await getCurrentUserId();
   if (userId !== currentUserId) {

@@ -15,6 +15,15 @@ export interface WellnessMetrics {
   ergonomicRiskScore: number;
   ergonomicRiskLabel: 'Low' | 'Mid' | 'High';
   ergonomicRiskMessageKey: 'ergonomicRiskLow' | 'ergonomicRiskMid' | 'ergonomicRiskHigh';
+  /**
+   * Shared cognitive state used by the dashboard header, hero and sidebar.
+   * Neural coherence is intentionally derived from this state, so the UI never
+   * communicates two conflicting cognitive diagnoses.
+   */
+  cognitiveState: 'Optimal' | 'Attention' | 'Recovery';
+  cognitiveStateMessageKey: 'cognitiveStateOptimal' | 'cognitiveStateAttention' | 'cognitiveStateRecovery';
+  cognitiveReadinessScore: number;
+  neuralCoherenceScore: number;
 }
 
 /**
@@ -156,6 +165,14 @@ export function calculateWellnessMetrics(
     ergonomicRiskMessageKey = 'ergonomicRiskMid';
   }
 
+  const cognitiveReadinessScore = 100 - finalFatigueScore;
+  const cognitiveState =
+    cognitiveFatigueLabel === 'High' ? 'Recovery' :
+    cognitiveFatigueLabel === 'Mid' ? 'Attention' : 'Optimal';
+  const cognitiveStateMessageKey =
+    cognitiveState === 'Recovery' ? 'cognitiveStateRecovery' :
+    cognitiveState === 'Attention' ? 'cognitiveStateAttention' : 'cognitiveStateOptimal';
+
   return {
     cognitiveFatigueScore: finalFatigueScore,
     cognitiveFatigueLabel,
@@ -163,5 +180,9 @@ export function calculateWellnessMetrics(
     ergonomicRiskScore: finalRiskScore,
     ergonomicRiskLabel,
     ergonomicRiskMessageKey,
+    cognitiveState,
+    cognitiveStateMessageKey,
+    cognitiveReadinessScore,
+    neuralCoherenceScore: cognitiveReadinessScore,
   };
 }

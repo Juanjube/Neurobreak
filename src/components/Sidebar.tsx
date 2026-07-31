@@ -1,8 +1,7 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Page, User, MindGameSession } from '../types';
-import { getSessionHistory, getMindGameHistory } from '../services/supabase';
-import { calculateWellnessMetrics, PhysicalSession } from '../utils/wellnessMetrics';
+import React from 'react';
+import { Page } from '../types';
+import { WellnessMetrics } from '../utils/wellnessMetrics';
 
 interface SidebarProps {
   onNavigate: (page: Page) => void;
@@ -10,42 +9,12 @@ interface SidebarProps {
   t: (key: any) => string;
   isOpen: boolean;
   onClose: () => void;
-  user: User;
+  metrics: WellnessMetrics;
+  metricsLoading: boolean;
+  metricsError: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, onClose, user }) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [physicalHistory, setPhysicalHistory] = useState<PhysicalSession[]>([]);
-  const [mentalHistory, setMentalHistory] = useState<MindGameSession[]>([]);
-
-  const loadHistories = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const [physRes, mentRes] = await Promise.all([
-        getSessionHistory(user.id),
-        getMindGameHistory(user.id, 20)
-      ]);
-
-      if (physRes.error) throw physRes.error;
-      if (mentRes.error) throw mentRes.error;
-
-      setPhysicalHistory((physRes.data || []) as PhysicalSession[]);
-      setMentalHistory((mentRes.data || []) as MindGameSession[]);
-    } catch (err) {
-      console.error('Error loading sidebar wellness history:', err);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [user.id]);
-
-  useEffect(() => {
-    loadHistories();
-  }, [loadHistories, user.progress.sessionsCompleted, user.progress.mentalClarity, user.progress.backHealth]);
-
-  const metrics = calculateWellnessMetrics(user, physicalHistory, mentalHistory);
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, onClose, metrics, metricsLoading, metricsError }) => {
 
   return (
     <>
@@ -76,12 +45,20 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           </button>
         </div>
         <div className="flex flex-col gap-6">
-          {error && (
+          {metricsError && (
             <div className="text-center bg-red-500/10 border border-red-500/20 py-1.5 px-3 rounded-lg text-[10px] text-red-400 flex items-center justify-center gap-1.5 animate-pulse">
               <span className="material-symbols-outlined text-xs">cloud_off</span>
               {t('liveDataUnavailable')}
             </div>
           )}
+
+          <button
+            onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
+            className="w-full bg-primary hover:bg-primary/90 text-content rounded-xl h-12 font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95"
+          >
+            <span className="material-symbols-outlined text-xl">play_circle</span>
+            {t('startFlow')}
+          </button>
 
           <div className="flex flex-col gap-2">
             <h3 className="text-muted text-xs font-bold uppercase tracking-widest">{t('fatigueMonitoring')}</h3>
@@ -109,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
               </div>
               <div className="flex justify-between items-center mt-2">
                 <p className="text-[10px] text-muted">
-                  Homeostasis: {loading ? t('homeostasisLoading') : t(metrics.homeostasisLabel === 'Stressed' ? 'homeostasisStressed' : 'homeostasisStable')}
+                  {t('cognitiveStateLabel')}: {metricsLoading ? t('homeostasisLoading') : t(metrics.cognitiveStateMessageKey)}
                 </p>
                 <p className="text-[10px] text-muted font-mono">{metrics.cognitiveFatigueScore}%</p>
               </div>
@@ -117,6 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           </div>
 
           <div className="flex flex-col gap-2">
+            <p className="text-muted text-xs font-bold uppercase tracking-widest">{t('ergonomicAlert')}</p>
             <div className={`border p-4 rounded-xl flex items-start gap-3 transition-colors duration-500 ${
               metrics.ergonomicRiskLabel === 'High' ? 'bg-red-500/10 border-red-500/30 text-red-400' :
               metrics.ergonomicRiskLabel === 'Mid' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
@@ -135,7 +113,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
                   metrics.ergonomicRiskLabel === 'Mid' ? 'text-amber-400' :
                   'text-emerald-400'
                 }`}>
-                  {t('riskAlert')} ({t(
+                  {t('posturalRisk')} ({t(
                     metrics.ergonomicRiskLabel === 'High' ? 'levelHigh' :
                     metrics.ergonomicRiskLabel === 'Mid' ? 'levelMid' : 'levelLow'
                   )})
@@ -152,7 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
           </div>
 
           <div className="flex flex-col gap-2 mt-4">
-            <h3 className="text-muted text-xs font-bold uppercase tracking-widest">Core Navigation</h3>
+            <h3 className="text-muted text-xs font-bold uppercase tracking-widest">{t('mainNavigation')}</h3>
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => { onNavigate(Page.DASHBOARD); onClose(); }}
@@ -184,16 +162,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, t, isOpen, o
               </button>
             </div>
           </div>
-        </div>
-
-        <div className="mt-auto">
-          <button
-            onClick={() => { onNavigate(Page.MOVEMENT_ENGINE); onClose(); }}
-            className="w-full bg-primary hover:bg-primary/90 text-content rounded-xl h-12 font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 active:scale-95"
-          >
-            <span className="material-symbols-outlined text-xl">play_circle</span>
-            {t('startFlow')}
-          </button>
         </div>
       </aside>
     </>

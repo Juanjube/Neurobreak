@@ -28,7 +28,7 @@ export interface Movement {
   intensity: 'Low' | 'Medium' | 'High';
 }
 
-export type MindGameCategory = 'Memory' | 'Focus' | 'Pattern';
+export type MindGameCategory = 'Memory' | 'Focus' | 'Pattern' | 'Number' | 'Change' | 'Timing' | 'Breathing';
 
 export interface MindGame {
   id: string;
@@ -40,6 +40,9 @@ export interface MindGame {
   category: MindGameCategory;
   neuroBenefit: string;
   difficulty: 'Easy' | 'Medium';
+  iconAsset?: string;
+  titleEs?: string;
+  descriptionEs?: string;
 }
 
 export interface MindGameSession {
@@ -59,6 +62,7 @@ export enum Page {
   MIND_GAMES = 'mind_games',
   RITUAL = 'ritual',
   INSIGHTS = 'insights',
+  PROFILE = 'profile',
   SETTINGS = 'settings'
 }
 

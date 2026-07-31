@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Page, User } from '../types';
+import { WellnessMetrics } from '../utils/wellnessMetrics';
 
 interface NavbarProps {
   user: User | null;
@@ -8,10 +9,11 @@ interface NavbarProps {
   onNavigate: (page: Page) => void;
   currentPage: Page;
   t: (key: any) => string;
+  cognitiveState: WellnessMetrics['cognitiveState'];
   onToggleMenu: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage, t, onToggleMenu }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage, t, cognitiveState, onToggleMenu }) => {
   // showMenu controla la visibilidad del menú desplegable del perfil de usuario (el que muestra "Settings" y "Logout")
   const [showMenu, setShowMenu] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -19,7 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
   useEffect(() => {
      const storedTheme = localStorage.getItem('theme');
      if (storedTheme) {
-       const isStoredDark = storedTheme === 'dark';
+       const isStoredDark = storedTheme === 'dark' || (storedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
        setIsDark(isStoredDark);
        if (isStoredDark) document.documentElement.classList.add('dark');
        else document.documentElement.classList.remove('dark');
@@ -67,6 +69,11 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
       </div>
 
       <div className="flex flex-1 justify-end gap-8 items-center">
+        <div className="hidden xl:flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
+          <span className="material-symbols-outlined text-sm text-accent-cyan">neurology</span>
+          <span className="text-xs text-muted">{t('cognitiveStateLabel')}</span>
+          <span className="text-xs font-bold text-content">{t(`cognitiveState${cognitiveState}`)}</span>
+        </div>
         <nav className="hidden lg:flex items-center gap-8">
           <button
             onClick={() => onNavigate(Page.DASHBOARD)}
@@ -148,6 +155,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
                     </label>
                   </div>
                 </div>
+                <button
+                  onClick={() => { onNavigate(Page.PROFILE); setShowMenu(false); }}
+                  className="w-full text-left px-4 py-2 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-sm">person</span>
+                  {t('profile')}
+                </button>
                 <button
                   onClick={() => { onNavigate(Page.SETTINGS); setShowMenu(false); }}
                   className="w-full text-left px-4 py-2 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2"
