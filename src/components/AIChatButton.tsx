@@ -16,7 +16,7 @@ interface Message {
 const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'ai', content: lang === 'es' ? 'Hola, soy tu asistente NeuroBreak. ¿En qué puedo ayudarte hoy?' : 'Hi, I\'m your NeuroBreak assistant. How can I help you today?' }
+    { role: 'ai', content: lang === 'es' ? 'Hola, soy tu asistente NeuroBreak. ¿En qué puedo ayudarte hoy?\n\nPuedo ayudarte a mejorar tu salud mental, sugerirte pausas para reducir la fatiga cognitiva, o recomendarte ejercicios fáciles para relajar tu mente y tu cuerpo.' : 'Hi, I\'m your NeuroBreak assistant. How can I help you today?\n\nI can help you improve your mental health, suggest breaks to reduce cognitive fatigue, or recommend easy exercises to relax your mind and body.' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -59,7 +59,7 @@ const AIChatButton: React.FC<AIChatButtonProps> = ({ t, lang }) => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+    <div className="flex flex-col items-end pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
         <div className="pointer-events-auto mb-4 w-80 md:w-96 bg-card-dark border border-[#233648] rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 flex flex-col max-h-[500px]">
