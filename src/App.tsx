@@ -16,6 +16,7 @@ import { supabase, getProfile, signOut, updateProfile, logSession, getSessionHis
 import { calculateWellnessMetrics, PhysicalSession } from './utils/wellnessMetrics';
 import { useAppSession } from './hooks/useAppSession';
 import "flag-icons/css/flag-icons.min.css";
+import MusicButton from './components/MusicButton';
 
 const App: React.FC = () => {
   // user almacena los datos del usuario logueado. Si es null, el usuario no ha iniciado sesión.
@@ -329,7 +330,12 @@ const App: React.FC = () => {
           )}
         </main>
       </div>
-      {user && <AIChatButton t={t} lang={user.language} />}
+      {user && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
+
+          <MusicButton />
+          <AIChatButton t={t} lang={user.language} />
+        </div>)}
     </div>
   );
 };
