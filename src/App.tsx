@@ -6,13 +6,14 @@ import MovementEngine from './components/MovementEngine';
 import MindGames from './components/MindGames';
 import Ritual from './components/Ritual';
 import Insights from './components/Insights';
-import ProfileSettings from './components/ProfileSettings';
+import Settings from './components/Settings';
 import Profile from './components/Profile';
+import ProfileEditor from './components/ProfileEditor';
 import AIChatButton from './components/AIChatButton';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { translations } from './constants/translations';
-import { supabase, getProfile, signOut, updateProfile, logSession, getSessionHistory, getMindGameHistory } from './services/supabase';
+import { supabase, getProfile, signOut, updateProfile, updateAccountDetails, uploadProfileAvatar, logSession, getSessionHistory, getMindGameHistory } from './services/supabase';
 import { calculateWellnessMetrics, PhysicalSession } from './utils/wellnessMetrics';
 import { useAppSession } from './hooks/useAppSession';
 import "flag-icons/css/flag-icons.min.css";
@@ -167,6 +168,32 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUpdateAccount = async (name: string, email: string, avatar?: string) => {
+    if (!user) return { emailChangeRequested: false, emailUpdated: false };
+
+    const result = await updateAccountDetails(user.id, name, email, avatar);
+    if (result.error) throw result.error;
+
+    // Keep the visible identity consistent immediately. The address only changes in
+    // the UI after Supabase has confirmed it, when confirmation is enabled.
+    setUser((current) => current ? {
+      ...current,
+      name,
+      avatar: avatar ?? current.avatar,
+      email: result.emailUpdated ? email : current.email,
+    } : current);
+
+    return {
+      emailChangeRequested: result.emailChangeRequested,
+      emailUpdated: result.emailUpdated,
+    };
+  };
+
+  const handleUploadProfileAvatar = async (file: File) => {
+    if (!user) throw new Error('Authentication required');
+    return uploadProfileAvatar(user.id, file);
+  };
+
   const handleLogout = async () => {
     await signOut();
   };
@@ -316,7 +343,7 @@ const App: React.FC = () => {
             />
           )}
           {currentPage === Page.SETTINGS && user && (
-            <ProfileSettings
+            <Settings
               user={user}
               onUpdateUser={handleUpdateUser}
               t={t}
@@ -325,7 +352,16 @@ const App: React.FC = () => {
           {currentPage === Page.PROFILE && user && (
             <Profile
               user={user}
+              onEditProfile={() => setCurrentPage(Page.PROFILE_EDIT)}
               onOpenSettings={() => setCurrentPage(Page.SETTINGS)}
+            />
+          )}
+          {currentPage === Page.PROFILE_EDIT && user && (
+            <ProfileEditor
+              user={user}
+              onBack={() => setCurrentPage(Page.PROFILE)}
+              onSave={handleUpdateAccount}
+              onUploadPhoto={handleUploadProfileAvatar}
             />
           )}
         </main>

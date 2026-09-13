@@ -10,12 +10,13 @@ interface PhysicalSession {
 
 interface ProfileProps {
   user: User;
+  onEditProfile: () => void;
   onOpenSettings: () => void;
 }
 
 type Period = 'month' | 'quarter' | 'year';
 
-const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
+const Profile: React.FC<ProfileProps> = ({ user, onEditProfile, onOpenSettings }) => {
   const [period, setPeriod] = useState<Period>('month');
   const [physicalHistory, setPhysicalHistory] = useState<PhysicalSession[]>([]);
   const [mentalHistory, setMentalHistory] = useState<MindGameSession[]>([]);
@@ -35,10 +36,17 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
           getMindGameHistory(user.id, 50),
         ]);
 
-        if (physical.error || mental.error) throw physical.error || mental.error;
         if (!active) return;
-        setPhysicalHistory((physical.data || []) as PhysicalSession[]);
-        setMentalHistory((mental.data || []) as MindGameSession[]);
+
+        if (physical.error) console.warn('Physical session history warning:', physical.error);
+        if (mental.error) console.warn('Mental game history warning:', mental.error);
+
+        if (physical.error && mental.error) {
+          setHistoryUnavailable(true);
+        } else {
+          setPhysicalHistory((physical.data || []) as PhysicalSession[]);
+          setMentalHistory((mental.data || []) as MindGameSession[]);
+        }
       } catch (error) {
         console.error('Unable to load profile history:', error);
         if (active) setHistoryUnavailable(true);
@@ -49,7 +57,11 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
 
     loadHistory();
     return () => { active = false; };
-  }, [user.id]);
+  }, [user.id, user.progress?.sessionsCompleted]);
+
+  const mentalClarity = user.progress?.mentalClarity ?? 0;
+  const backHealth = user.progress?.backHealth ?? 0;
+  const sessionsCompleted = user.progress?.sessionsCompleted ?? 0;
 
   const activity = useMemo(() => {
     const days = period === 'month' ? 28 : period === 'quarter' ? 84 : 365;
@@ -69,21 +81,26 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
       buckets[bucketCount - 1 - index] += 1;
     });
 
-    const completed = events.filter((event) => new Date(event.completed_at) >= minimumDate).length;
-    const totalMinutes = events.reduce((total, event) => total + (Number(event.duration) || 0), 0) / 60;
+    const periodEvents = events.filter((event) => {
+      const completedAt = new Date(event.completed_at);
+      return !Number.isNaN(completedAt.getTime()) && completedAt >= minimumDate;
+    });
+
+    const completed = periodEvents.length;
+    const totalMinutes = periodEvents.reduce((total, event) => total + (Number(event.duration) || 0), 0) / 60;
     return { buckets, completed, totalMinutes };
   }, [period, physicalHistory, mentalHistory]);
 
   const metrics = useMemo(() => {
-    const focus = Math.round(Math.min(100, 70 + user.progress.mentalClarity * 3));
+    const focus = Math.round(Math.min(100, 70 + mentalClarity * 3));
     const consistency = Math.round(Math.min(100, (activity.completed / (period === 'month' ? 8 : period === 'quarter' ? 24 : 96)) * 100));
     return {
       focus,
-      recovery: Math.round(user.progress.backHealth),
+      recovery: Math.round(backHealth),
       hours: (activity.totalMinutes / 60).toFixed(1),
       consistency,
     };
-  }, [activity.completed, activity.totalMinutes, period, user.progress.backHealth, user.progress.mentalClarity]);
+  }, [activity.completed, activity.totalMinutes, backHealth, mentalClarity, period]);
 
   const exportReport = () => {
     const title = isSpanish ? 'Informe de perfil NeuroBreak' : 'NeuroBreak profile report';
@@ -91,9 +108,9 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
       title,
       `${isSpanish ? 'Usuario' : 'User'}: ${user.name}`,
       `${isSpanish ? 'Objetivo' : 'Goal'}: ${user.goal || '-'}`,
-      `${isSpanish ? 'Claridad mental' : 'Mental clarity'}: ${user.progress.mentalClarity}/10`,
-      `${isSpanish ? 'Salud postural' : 'Back health'}: ${user.progress.backHealth}%`,
-      `${isSpanish ? 'Sesiones completadas' : 'Sessions completed'}: ${user.progress.sessionsCompleted}`,
+      `${isSpanish ? 'Claridad mental' : 'Mental clarity'}: ${mentalClarity}/10`,
+      `${isSpanish ? 'Salud postural' : 'Back health'}: ${backHealth}%`,
+      `${isSpanish ? 'Sesiones completadas' : 'Sessions completed'}: ${sessionsCompleted}`,
       `${isSpanish ? 'Actividad del periodo' : 'Period activity'}: ${activity.completed}`,
       `${isSpanish ? 'Horas de actividad' : 'Activity hours'}: ${metrics.hours}`,
     ].join('\n');
@@ -112,74 +129,37 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
     : { month: 'Month', quarter: 'Quarter', year: 'Year' };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <header className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <header className="mb-7 flex items-start justify-between border-b border-border pb-5">
         <div>
-          <p className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-[0.18em]">
-            <span className="material-symbols-outlined text-base">account_circle</span>
-            NeuroBreak
-          </p>
-          <h1 className="mt-2 text-content text-3xl font-black tracking-tight">{isSpanish ? 'Centro de perfil personal' : 'Personal Profile Hub'}</h1>
-          <p className="mt-1 text-muted text-sm">{isSpanish ? 'Visualiza tu progreso físico y cognitivo en un solo lugar.' : 'See your physical and cognitive progress in one place.'}</p>
+          <h1 className="text-3xl font-black tracking-tight text-content">{isSpanish ? 'Centro de perfil personal' : 'Personal Profile Hub'}</h1>
+          <p className="mt-1 text-sm text-muted">{isSpanish ? 'Gestiona tus biométricas y áreas de enfoque cognitivo.' : 'Manage your biometrics and cognitive focus areas.'}</p>
         </div>
-        <button onClick={onOpenSettings} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-4 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-content">
-          <span className="material-symbols-outlined text-lg">edit</span>
-          {isSpanish ? 'Editar perfil' : 'Edit profile'}
-        </button>
+        <span className="hidden items-center gap-1.5 text-xs font-bold text-accent-teal sm:inline-flex"><span className="material-symbols-outlined text-base">cloud_done</span>{isSpanish ? 'Datos sincronizados' : 'Data synced'}</span>
       </header>
 
-      <section className="relative overflow-hidden rounded-2xl border border-border bg-surface p-5 md:p-7">
-        <div className="absolute -right-16 -top-20 size-56 rounded-full bg-primary/15 blur-3xl" />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="size-20 shrink-0 overflow-hidden rounded-full border-2 border-primary/50 bg-primary/15 shadow-lg shadow-primary/10">
-              <img src={user.avatar || '/Logo.jpg'} alt="" className="size-full object-cover" onError={(event) => { event.currentTarget.src = '/Logo.jpg'; }} />
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[0.78fr_1.22fr]">
+        <aside className="space-y-6">
+          <section className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 text-center">
+            <div className="absolute -right-16 -top-16 size-40 rounded-full bg-primary/15 blur-3xl" />
+            <div className="relative mx-auto w-fit">
+              <div className="size-24 overflow-hidden rounded-full border-2 border-primary/60 bg-primary/15 shadow-lg shadow-primary/15"><img src={user.avatar || '/Logo.jpg'} alt="" className="size-full object-cover" onError={(event) => { event.currentTarget.src = '/Logo.jpg'; }} /></div>
+              <button onClick={onEditProfile} aria-label={isSpanish ? 'Editar perfil' : 'Edit profile'} className="absolute -right-1 bottom-0 inline-flex size-8 items-center justify-center rounded-full border border-primary/60 bg-background text-primary transition-colors hover:bg-primary hover:text-content"><span className="material-symbols-outlined text-base">edit</span></button>
             </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-content text-2xl font-black break-all">{user.name}</h2>
-                <span className="rounded-full bg-accent-teal/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-teal">{isSpanish ? 'Activo' : 'Active'}</span>
-              </div>
-              <p className="mt-1 text-sm text-muted break-all">{user.email}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/50 px-2.5 py-1 text-[10px] font-bold text-muted"><span className="material-symbols-outlined text-sm text-primary">psychology</span>{goalLabel}</span>
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/50 px-2.5 py-1 text-[10px] font-bold text-muted"><span className="material-symbols-outlined text-sm text-primary">language</span>{user.language === 'es' ? 'Español' : 'English'}</span>
-              </div>
-            </div>
-          </div>
-          <div className="text-left sm:text-right">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted">{isSpanish ? 'Resiliencia semanal' : 'Weekly resilience'}</p>
-            <p className="mt-1 text-3xl font-black text-primary">{metrics.focus}<span className="text-base">%</span></p>
-            <p className="text-xs text-muted">{isSpanish ? 'basada en tu claridad mental' : 'based on mental clarity'}</p>
-          </div>
-        </div>
-      </section>
+            <h2 className="mt-4 break-words text-2xl font-black text-content">{user.name}</h2>
+            <p className="mt-1 break-all text-sm text-muted">{user.email}</p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2"><span className="rounded-full bg-accent-teal/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-accent-teal">{isSpanish ? 'Activo' : 'Active'}</span><span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary"><span className="material-symbols-outlined text-xs">psychology</span>{goalLabel}</span></div>
+          </section>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.25fr_0.8fr]">
-        <section className="rounded-2xl border border-border bg-surface p-5 md:p-6">
-          <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <h2 className="flex items-center gap-2 text-content font-black"><span className="material-symbols-outlined text-primary">favorite</span>{isSpanish ? 'Perfil biológico' : 'Biological profile'}</h2>
-              <p className="mt-1 text-xs text-muted">{isSpanish ? 'Indicadores de bienestar registrados en NeuroBreak.' : 'Wellness indicators recorded in NeuroBreak.'}</p>
-            </div>
-            <button onClick={onOpenSettings} className="text-xs font-bold text-primary hover:underline">{isSpanish ? 'Editar perfil' : 'Edit profile'}</button>
-          </div>
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <MetricCard icon="neurology" label={isSpanish ? 'Claridad mental' : 'Mental clarity'} value={`${user.progress.mentalClarity.toFixed(1)}/10`} tone="primary" />
-            <MetricCard icon="accessibility_new" label={isSpanish ? 'Salud postural' : 'Back health'} value={`${user.progress.backHealth}%`} tone="teal" />
-            <MetricCard icon="bolt" label={isSpanish ? 'Sesiones' : 'Sessions'} value={String(user.progress.sessionsCompleted)} tone="cyan" />
-          </div>
-          <div className="mt-5 rounded-xl border border-border bg-background/40 p-4">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold text-content">{isSpanish ? 'Estado de bienestar' : 'Wellness state'}</p>
-                <p className="mt-1 text-xs text-muted">{isSpanish ? 'Progreso compuesto según tu actividad y objetivos.' : 'Composite progress based on your activity and goals.'}</p>
-              </div>
-              <span className="text-sm font-black text-primary">{Math.round((user.progress.mentalClarity / 10) * 50 + user.progress.backHealth * 0.5)}%</span>
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-border"><div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-cyan transition-all duration-700" style={{ width: `${Math.round((user.progress.mentalClarity / 10) * 50 + user.progress.backHealth * 0.5)}%` }} /></div>
-          </div>
-        </section>
+          <section className="rounded-2xl border border-border bg-surface p-5">
+            <div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-black text-content"><span className="material-symbols-outlined text-primary">favorite</span>{isSpanish ? 'Perfil biológico' : 'Biological profile'}</h2><button onClick={onEditProfile} className="text-xs font-bold text-primary hover:underline">{isSpanish ? 'Editar' : 'Edit'}</button></div>
+            <div className="mt-5 grid grid-cols-2 gap-3"><MetricCard icon="neurology" label={isSpanish ? 'Claridad mental' : 'Mental clarity'} value={`${mentalClarity.toFixed(1)}/10`} tone="primary" /><MetricCard icon="accessibility_new" label={isSpanish ? 'Salud postural' : 'Back health'} value={`${backHealth}%`} tone="teal" /></div>
+            <div className="mt-4 rounded-xl border border-border bg-background/40 p-4"><div className="flex items-center justify-between"><p className="text-xs font-bold text-content">{isSpanish ? 'Estado de bienestar' : 'Wellness state'}</p><span className="text-sm font-black text-primary">{Math.round((mentalClarity / 10) * 50 + backHealth * 0.5)}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-border"><div className="h-full rounded-full bg-gradient-to-r from-primary to-accent-cyan transition-all duration-700" style={{ width: `${Math.round((mentalClarity / 10) * 50 + backHealth * 0.5)}%` }} /></div></div>
+          </section>
+        </aside>
+
+        <div className="space-y-6">
+          <section className="grid grid-cols-1 gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-[1fr_auto] sm:items-center"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{isSpanish ? 'Resiliencia semanal' : 'Weekly resilience'}</p><p className="mt-1 text-sm text-muted">{isSpanish ? 'Tu umbral cognitivo actual' : 'Your current cognitive threshold'}</p></div><div className="text-left sm:text-right"><p className="text-3xl font-black text-primary">{metrics.focus}<span className="text-base text-muted">/100</span></p><p className="text-xs text-accent-teal">{isSpanish ? 'En rango óptimo' : 'In optimal range'}</p></div></section>
 
         <section className="rounded-2xl border border-border bg-surface p-5 md:p-6">
           <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
@@ -187,7 +167,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
               <h2 className="flex items-center gap-2 text-content font-black"><span className="material-symbols-outlined text-primary">emoji_objects</span>{isSpanish ? 'Meta cognitiva' : 'Cognitive goal'}</h2>
               <p className="mt-1 text-xs text-muted">{isSpanish ? 'Tu enfoque actual dentro de NeuroBreak.' : 'Your current focus in NeuroBreak.'}</p>
             </div>
-            <button onClick={onOpenSettings} className="rounded-lg p-1 text-muted hover:bg-primary/10 hover:text-primary" aria-label={isSpanish ? 'Editar meta' : 'Edit goal'}><span className="material-symbols-outlined text-lg">edit</span></button>
+            <button onClick={onOpenSettings} className="rounded-lg p-1 text-muted hover:bg-primary/10 hover:text-primary" aria-label={isSpanish ? 'Configurar meta' : 'Configure goal'}><span className="material-symbols-outlined text-lg">tune</span></button>
           </div>
           <div className="mt-5 rounded-xl border border-primary/30 bg-primary/10 p-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{isSpanish ? 'Objetivo activo' : 'Active goal'}</p>
@@ -196,9 +176,8 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
           </div>
           <button onClick={onOpenSettings} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-xs font-bold text-muted transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"><span className="material-symbols-outlined text-base">add</span>{isSpanish ? 'Actualizar objetivo' : 'Update goal'}</button>
         </section>
-      </div>
 
-      <section className="rounded-2xl border border-border bg-surface p-5 md:p-6">
+          <section className="rounded-2xl border border-border bg-surface p-5 md:p-6">
         <div className="flex flex-col gap-4 border-b border-border pb-4 md:flex-row md:items-start md:justify-between">
           <div>
             <h2 className="flex items-center gap-2 text-content font-black"><span className="material-symbols-outlined text-primary">monitoring</span>{isSpanish ? 'Estadísticas de neuro-resiliencia' : 'Neuro-resilience statistics'}</h2>
@@ -218,12 +197,14 @@ const Profile: React.FC<ProfileProps> = ({ user, onOpenSettings }) => {
           {activity.buckets.map((value, index) => <div key={index} className="group flex h-full flex-1 items-end"><div title={`${value} ${isSpanish ? 'actividades' : 'activities'}`} className="w-full min-h-1 rounded-t bg-primary/50 transition-all duration-500 group-hover:bg-accent-cyan" style={{ height: `${Math.max(4, (value / maximumActivity) * 100)}%` }} /></div>)}
         </div>
         <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-wider text-muted"><span>{isSpanish ? 'Inicio' : 'Start'}</span><span>{activity.completed} {isSpanish ? 'actividades' : 'activities'}</span><span>{isSpanish ? 'Hoy' : 'Today'}</span></div>
-      </section>
+          </section>
 
-      <footer className="flex flex-col gap-3 border-t border-border pt-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>{isSpanish ? 'Tus datos de progreso se sincronizan con tu cuenta.' : 'Your progress data is synced with your account.'}</p>
-        <button onClick={exportReport} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-content transition-colors hover:bg-primary/90"><span className="material-symbols-outlined text-base">download</span>{isSpanish ? 'Exportar informe' : 'Export report'}</button>
-      </footer>
+          <footer className="flex flex-col gap-3 border-t border-border pt-1 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+            <p>{isSpanish ? 'Tus datos de progreso se sincronizan con tu cuenta.' : 'Your progress data is synced with your account.'}</p>
+            <button onClick={exportReport} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-content transition-colors hover:bg-primary/90"><span className="material-symbols-outlined text-base">download</span>{isSpanish ? 'Exportar informe' : 'Export report'}</button>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 };

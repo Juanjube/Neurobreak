@@ -103,7 +103,7 @@ src/
 | `Sidebar.tsx`       | Menú lateral de navegación                                |
 | `MindGames.tsx`     | Interfaz de juegos mentales                               |
 | `MovementEngine.tsx`| Motor de sesiones de movimiento                           |
-| `ProfileSettings.tsx`| Edición del perfil de usuario                            |
+| `Settings.tsx`       | Configuración y edición de datos de cuenta               |
 | `Insights.tsx`      | Análisis y visualización de progreso                      |
 | `Ritual.tsx`        | Flujo de ritual/rutina diaria                             |
 | `AIchatButton.tsx`  | Botón de chat con IA (Gemini)                             |

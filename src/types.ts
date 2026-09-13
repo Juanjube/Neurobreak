@@ -63,6 +63,7 @@ export enum Page {
   RITUAL = 'ritual',
   INSIGHTS = 'insights',
   PROFILE = 'profile',
+  PROFILE_EDIT = 'profile_edit',
   SETTINGS = 'settings'
 }
 

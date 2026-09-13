@@ -16,28 +16,14 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage, t, cognitiveState, onToggleMenu }) => {
   // showMenu controla la visibilidad del menú desplegable del perfil de usuario (el que muestra "Settings" y "Logout")
   const [showMenu, setShowMenu] = useState(false);
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
-
   useEffect(() => {
-     const storedTheme = localStorage.getItem('theme');
-     if (storedTheme) {
-       const isStoredDark = storedTheme === 'dark' || (storedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-       setIsDark(isStoredDark);
-       if (isStoredDark) document.documentElement.classList.add('dark');
-       else document.documentElement.classList.remove('dark');
-     }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      const isStoredDark = storedTheme === 'dark' || (storedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isStoredDark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('theme', nextDark ? 'dark' : 'light');
-  };
+  }, []);
 
   return (
     <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-border px-4 md:px-10 py-3 bg-background/80 backdrop-blur-md sticky top-0 z-50">
@@ -119,59 +105,25 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, currentPage
               onClick={() => setShowMenu(!showMenu)}
             />
             {showMenu && (
-              <div className="absolute right-0 mt-2 w-64 bg-surface border border-border rounded-xl shadow-2xl py-2 z-50">
-                {/* Theme Toggle Row */}
-                <div className="px-4 py-3 flex items-center justify-between border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm text-muted">{isDark ? 'dark_mode' : 'light_mode'}</span>
-                    <span className="text-sm text-muted font-medium">{isDark ? 'Modo Oscuro' : 'Modo Claro'}</span>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      id="theme-toggle-cb"
-                      className="theme-toggle-checkbox"
-                      checked={!isDark}
-                      onChange={toggleTheme}
-                    />
-                    <label htmlFor="theme-toggle-cb" className="theme-toggle-label">
-                      <span className="theme-toggle-button">
-                        <span className="theme-toggle-crater theme-crater-1"></span>
-                        <span className="theme-toggle-crater theme-crater-2"></span>
-                        <span className="theme-toggle-crater theme-crater-3"></span>
-                        <span className="theme-toggle-crater theme-crater-4"></span>
-                        <span className="theme-toggle-crater theme-crater-5"></span>
-                        <span className="theme-toggle-crater theme-crater-6"></span>
-                        <span className="theme-toggle-crater theme-crater-7"></span>
-                      </span>
-                      <span className="theme-star theme-star-1"></span>
-                      <span className="theme-star theme-star-2"></span>
-                      <span className="theme-star theme-star-3"></span>
-                      <span className="theme-star theme-star-4"></span>
-                      <span className="theme-star theme-star-5"></span>
-                      <span className="theme-star theme-star-6"></span>
-                      <span className="theme-star theme-star-7"></span>
-                      <span className="theme-star theme-star-8"></span>
-                    </label>
-                  </div>
-                </div>
+              <div className="absolute right-0 mt-2 w-56 bg-surface border border-border rounded-xl shadow-2xl py-2 z-50">
                 <button
                   onClick={() => { onNavigate(Page.PROFILE); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2.5 transition-colors"
                 >
                   <span className="material-symbols-outlined text-sm">person</span>
                   {t('profile')}
                 </button>
                 <button
                   onClick={() => { onNavigate(Page.SETTINGS); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm text-muted hover:text-content hover:bg-primary/10 flex items-center gap-2.5 transition-colors"
                 >
                   <span className="material-symbols-outlined text-sm">settings</span>
                   {t('settings')}
                 </button>
+                <div className="my-1 border-t border-border" />
                 <button
                   onClick={() => { onLogout(); setShowMenu(false); }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2.5 transition-colors"
                 >
                   <span className="material-symbols-outlined text-sm">logout</span>
                   {t('logout')}

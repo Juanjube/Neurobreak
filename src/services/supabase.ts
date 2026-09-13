@@ -4,6 +4,8 @@ import { User } from '../types';
 import {
   displayNameSchema,
   durationSchema,
+  emailSchema,
+  avatarUrlSchema,
   firstValidationError,
   mindGameIdSchema,
   movementIdSchema,
@@ -75,6 +77,68 @@ export const requestPasswordReset = async (email: string) => {
     redirectTo: `${window.location.origin}`,
   });
   return { data, error };
+};
+
+const PROFILE_AVATAR_BUCKET = 'profile-avatars';
+const ALLOWED_AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+
+export const uploadProfileAvatar = async (userId: string, file: File) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) throw new Error('Cannot upload an avatar for another user');
+  if (!ALLOWED_AVATAR_TYPES.has(file.type)) throw new Error('Choose a JPG, PNG, or WEBP image.');
+  if (file.size > MAX_AVATAR_BYTES) throw new Error('The image must be 5 MB or smaller.');
+
+  const { error } = await supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .upload(`${currentUserId}/avatar`, file, { cacheControl: '3600', contentType: file.type, upsert: true });
+  if (error) throw error;
+
+  const { data } = supabase.storage.from(PROFILE_AVATAR_BUCKET).getPublicUrl(`${currentUserId}/avatar`);
+  return `${data.publicUrl}?v=${Date.now()}`;
+};
+
+/**
+ * Keeps the identity shown in NeuroBreak aligned with Supabase Auth.
+ * Email changes can require confirmation depending on the Supabase project settings.
+ */
+export const updateAccountDetails = async (userId: string, name: string, email: string, avatar?: string) => {
+  const currentUserId = await getCurrentUserId();
+  if (userId !== currentUserId) {
+    throw new Error('Cannot update another user account');
+  }
+
+  const safeName = displayNameSchema.parse(name);
+  const safeEmail = emailSchema.parse(email);
+  const safeAvatar = avatar === undefined ? undefined : avatarUrlSchema.parse(avatar);
+  const { data: { user: currentAuthUser }, error: currentUserError } = await supabase.auth.getUser();
+  if (currentUserError || !currentAuthUser) {
+    throw currentUserError || new Error('Authentication required');
+  }
+
+  const authUpdates: { data: { full_name: string; avatar_url?: string }; email?: string } = {
+    data: { full_name: safeName, ...(safeAvatar !== undefined ? { avatar_url: safeAvatar } : {}) },
+  };
+  if (safeEmail !== currentAuthUser.email?.toLowerCase()) {
+    authUpdates.email = safeEmail;
+  }
+
+  const { data: authData, error: authError } = await supabase.auth.updateUser(authUpdates);
+  if (authError) return { data: null, error: authError, emailChangeRequested: Boolean(authUpdates.email) };
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ full_name: safeName, ...(safeAvatar !== undefined ? { avatar_url: safeAvatar } : {}) })
+    .eq('id', currentUserId)
+    .select()
+    .single();
+
+  return {
+    data,
+    error,
+    emailChangeRequested: Boolean(authUpdates.email),
+    emailUpdated: authData.user?.email?.toLowerCase() === safeEmail,
+  };
 };
 
 export const getProfile = async (userId: string) => {
