@@ -16,6 +16,7 @@ import { translations } from './constants/translations';
 import { supabase, getProfile, signOut, updateProfile, updateAccountDetails, uploadProfileAvatar, logSession, getSessionHistory, getMindGameHistory } from './services/supabase';
 import { calculateWellnessMetrics, PhysicalSession } from './utils/wellnessMetrics';
 import { useAppSession } from './hooks/useAppSession';
+import { GoalId, toGoalId } from './constants/goals';
 import "flag-icons/css/flag-icons.min.css";
 import MusicButton from './components/MusicButton';
 
@@ -94,7 +95,7 @@ const App: React.FC = () => {
       try {
         const [physicalResult, mentalResult] = await Promise.all([
           getSessionHistory(user.id),
-          getMindGameHistory(user.id, 20),
+          getMindGameHistory(user.id, 200),
         ]);
         if (physicalResult.error) throw physicalResult.error;
         if (mentalResult.error) throw mentalResult.error;
@@ -130,7 +131,7 @@ const App: React.FC = () => {
           name: data.full_name || 'Explorer',
           email: email,
           avatar: data.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8tVVenH4DAYEjgMcmJ3MhTfeSY7hLzxL3LH8vuuMQcXlK6UWw67D4PK06KVu6pjEAOdnthAhxmEstZY1xrmqeuFWfh_7tetgkURLbkZu6DoXIxztVqPmcJAxhRwI2CEKff6Zo78mLCSp_-Gmuwb-Sl-1n8gtW_pIQYXEFUripk-Qm_KWVDkSIue0_1GWTKVZPjEfKpAx0D2_LrFM8Wn-oo5KybVeuzSGTiy_1ogWLP9_blRY-6HjV4R-KgPKDIC8bdQ31orxbiTnH',
-          goal: data.goal || 'Deep Work',
+          goal: toGoalId(data.goal),
           language: (data.language as Language) || 'en',
           progress: {
             mentalClarity: data.mental_clarity ?? 0,
@@ -166,6 +167,14 @@ const App: React.FC = () => {
       if (error) throw error;
       setUser(updatedUser);
     }
+  };
+
+  const handleUpdateGoal = async (goal: GoalId) => {
+    if (!user) return;
+
+    const { error } = await updateProfile(user.id, { goal });
+    if (error) throw error;
+    setUser((current) => (current ? { ...current, goal } : current));
   };
 
   const handleUpdateAccount = async (name: string, email: string, avatar?: string) => {
@@ -352,8 +361,13 @@ const App: React.FC = () => {
           {currentPage === Page.PROFILE && user && (
             <Profile
               user={user}
+              physicalHistory={physicalHistory}
+              mentalHistory={mentalHistory}
+              historyLoading={metricsLoading}
+              historyError={metricsError}
               onEditProfile={() => setCurrentPage(Page.PROFILE_EDIT)}
               onOpenSettings={() => setCurrentPage(Page.SETTINGS)}
+              onUpdateGoal={handleUpdateGoal}
             />
           )}
           {currentPage === Page.PROFILE_EDIT && user && (
@@ -369,7 +383,7 @@ const App: React.FC = () => {
       {user && (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
 
-          <MusicButton />
+          <MusicButton lang={user.language} />
           <AIChatButton t={t} lang={user.language} />
         </div>)}
     </div>

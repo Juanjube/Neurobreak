@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { GOAL_IDS, normalizeGoal } from '../constants/goals';
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
 export const cleanText = (value: string) => value.normalize('NFKC').replace(CONTROL_CHARS, '').trim();
 
-export const allowedGoals = ['Deep Work', 'Creative Flow', 'Back Health', 'Stress Management'] as const;
+export const allowedGoals = GOAL_IDS;
 
 export const emailSchema = z
   .string()
@@ -43,7 +44,12 @@ export const avatarUrlSchema = z
     }, 'Avatar must be a valid http or https URL.')
   );
 
-export const goalSchema = z.enum(allowedGoals);
+// Aceptamos tanto el id canónico como las etiquetas antiguas guardadas en perfiles
+// existentes: normalizamos primero y validamos después.
+export const goalSchema = z
+  .unknown()
+  .transform(normalizeGoal)
+  .pipe(z.enum(allowedGoals, { message: 'Unknown goal.' }));
 export const languageSchema = z.enum(['en', 'es']);
 
 export const loginSchema = z.object({

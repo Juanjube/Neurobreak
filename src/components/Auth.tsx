@@ -4,6 +4,7 @@ import { User } from '../types';
 import { signInWithPassword, signUp, signInWithGoogle } from '../services/supabase';
 import { translations } from '../constants/translations';
 import { firstValidationError, loginSchema, registrationSchema } from '../utils/validation';
+import { DEFAULT_GOAL_ID, GOALS, GoalId } from '../constants/goals';
 
 interface AuthProps {
   onLogin: (user: User) => void;
@@ -17,7 +18,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
-  const [goal, setGoal] = useState<keyof typeof translations['en']>('goalDeepWork');
+  const [goal, setGoal] = useState<GoalId>(DEFAULT_GOAL_ID);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
@@ -42,7 +43,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           name,
           email,
           password,
-          goal: translations['en'][goal],
+          goal,
         });
         if (!parsed.success) throw new Error(firstValidationError(parsed.error));
 
@@ -229,13 +230,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 <div className="relative">
                   <select
                     value={goal}
-                    onChange={(e) => setGoal(e.target.value as keyof typeof translations['en'])}
+                    onChange={(e) => setGoal(e.target.value as GoalId)}
                     className="bg-transparent border border-border rounded-xl text-content focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] h-12 px-4 w-full appearance-none transition-colors"
                   >
-                    <option value="goalDeepWork" className="bg-[#080B0E]">{t('goalDeepWork')}</option>
-                    <option value="goalCreativeFlow" className="bg-[#080B0E]">{t('goalCreativeFlow')}</option>
-                    <option value="goalSpinalRecovery" className="bg-[#080B0E]">{t('goalSpinalRecovery')}</option>
-                    <option value="goalVagusNerve" className="bg-[#080B0E]">{t('goalVagusNerve')}</option>
+                    {GOALS.map((option) => (
+                      <option key={option.id} value={option.id} className="bg-[#080B0E]">{t(option.translationKey)}</option>
+                    ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-content/40">
                     <span className="material-symbols-outlined text-[20px]">expand_more</span>
