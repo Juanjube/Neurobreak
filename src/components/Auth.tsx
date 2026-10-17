@@ -76,7 +76,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     return (
       <div className="min-h-[100dvh] bg-[#080B0E] text-content font-sans relative flex lg:flex-row flex-col">
         {/* Global Header */}
-        <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-10 pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50 pointer-events-none">
           <div className="flex items-center gap-3">
             <img src="/Logo.jpg" alt="NeuroBreak Map" className="w-8 h-8 rounded shrink-0 object-cover" />
             <span className="font-bold tracking-tight">NeuroBreak</span>

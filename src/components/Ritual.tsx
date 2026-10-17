@@ -15,21 +15,45 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
   const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [instructions, setInstructions] = useState<string[]>([]);
   const [loadingCoach, setLoadingCoach] = useState(true);
   const timerRef = useRef<number | null>(null);
 
+  // Reinicia el temporizador solo al cambiar de movimiento (no al cambiar de idioma).
   useEffect(() => {
     if (movement) {
       setTimeLeft(movement.durationSeconds);
-      setLoadingCoach(true);
-      geminiService.generateInstructions(movement.title, movement.category, lang)
-        .then(steps => {
-          setInstructions(steps);
-          setLoadingCoach(false);
-        })
-        .catch(() => setLoadingCoach(false));
+      setIsActive(false);
+      setIsFinished(false);
+      setHasStarted(false);
     }
+  }, [movement]);
+
+  useEffect(() => {
+    if (!movement) return;
+
+    // Contenido fijo y revisado: no depende de la IA.
+    if (movement.steps) {
+      setInstructions(movement.steps[lang === 'es' ? 'es' : 'en']);
+      setLoadingCoach(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingCoach(true);
+    geminiService.generateInstructions(movement.title, movement.category, lang)
+      .then(steps => {
+        if (cancelled) return;
+        setInstructions(steps);
+        setLoadingCoach(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadingCoach(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [movement, lang]);
 
   useEffect(() => {
@@ -58,7 +82,12 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
   const startSession = () => {
     setIsActive(true);
     setIsFinished(false);
+    setHasStarted(true);
   };
+
+  const pauseSession = () => setIsActive(false);
+
+  const isPaused = hasStarted && !isActive && !isFinished;
 
   return (
     <div className="p-4 md:p-8 max-w-[1200px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 items-start animate-in zoom-in-95 duration-500">
@@ -74,7 +103,7 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-2">
             <span className="material-symbols-outlined text-xs">settings_accessibility</span>
-            {movement.category} {isActive ? t('inProgress').toUpperCase() : 'ACTIVE'}
+            {movement.category} {isActive ? t('inProgress').toUpperCase() : isPaused ? t('sessionPaused').toUpperCase() : 'ACTIVE'}
           </div>
           <h1 className="text-content text-4xl lg:text-5xl font-bold leading-tight">{movement.title}</h1>
           <p className="text-content/60 text-lg">{movement.description}</p>
@@ -89,20 +118,34 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
             />
             
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 z-20">
-              {!isActive && !isFinished && (
-                <button 
+              {!hasStarted && (
+                <button
                   onClick={startSession}
                   className="size-24 rounded-full bg-primary text-content shadow-2xl hover:scale-110 transition-transform flex items-center justify-center"
                 >
                   <span className="material-symbols-outlined !text-5xl">play_arrow</span>
                 </button>
               )}
-              
-              {(isActive || isFinished) && (
-                <div className="text-center">
+
+              {hasStarted && (
+                <div className="text-center flex flex-col items-center">
                   <div className="text-7xl font-black text-content tabular-nums drop-shadow-2xl">
                     {formatTime(timeLeft)}
                   </div>
+                  {!isFinished && (
+                    <button
+                      onClick={isActive ? pauseSession : startSession}
+                      aria-label={isActive ? t('pauseSession') : t('resumeSession')}
+                      className="mt-6 size-16 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-content shadow-2xl hover:scale-110 transition-all flex items-center justify-center"
+                    >
+                      <span className="material-symbols-outlined !text-4xl">{isActive ? 'pause' : 'play_arrow'}</span>
+                    </button>
+                  )}
+                  {isPaused && (
+                    <div className="mt-3 text-content/70 font-bold text-sm uppercase tracking-widest">
+                      {t('sessionPaused')}
+                    </div>
+                  )}
                   {isFinished && (
                     <div className="mt-4 text-accent-teal font-black text-xl animate-bounce">
                       {t('sessionOptimized')}
@@ -170,12 +213,12 @@ const Ritual: React.FC<RitualProps> = ({ movement, onBack, onComplete, t, lang }
           </div>
 
           {!isFinished ? (
-            <button 
-              disabled={isActive}
-              onClick={startSession}
-              className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all ${isActive ? 'bg-[#233648] text-[#92adc9] cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-content active:scale-95'}`}
+            <button
+              onClick={isActive ? pauseSession : startSession}
+              className={`w-full font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isActive ? 'bg-[#233648] hover:bg-[#2c4359] text-content' : 'bg-primary hover:bg-primary/90 text-content'}`}
             >
-              {isActive ? t('inProgress') : t('startSession')}
+              <span className="material-symbols-outlined">{isActive ? 'pause' : 'play_arrow'}</span>
+              {isActive ? t('pauseSession') : isPaused ? t('resumeSession') : t('startSession')}
             </button>
           ) : (
             <button 

@@ -92,8 +92,9 @@ export const MIND_GAME_LIBRARY: MindGame[] = [
     titleEs: 'Respiración en Espejo',
     description: 'Match gentle taps to a 4-7-8 breathing rhythm.',
     descriptionEs: 'Sincroniza toques suaves con un ritmo de respiración 4-7-8.',
-    duration: '2m',
-    durationSeconds: 120,
+    duration: '1m',
+    // 3 ciclos 4-7-8 (~57 s): dentro del máximo de 4 ciclos recomendado para principiantes.
+    durationSeconds: 60,
     icon: 'airwave',
     iconAsset: mirrorBreathingIcon,
     category: 'Breathing',

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MOVEMENT_LIBRARY } from '../constants/movements';
 import { Movement, MovementCategory } from '../types';
@@ -60,6 +59,19 @@ const MovementEngine: React.FC<MovementEngineProps> = ({
     setContent(null);
     setLoading(true);
     
+    // Contenido fijo y revisado: no depende de la IA.
+    const langKey = lang === 'es' ? 'es' : 'en';
+    if (type === 'why' && m.why) {
+      setContent(m.why[langKey]);
+      setLoading(false);
+      return;
+    }
+    if (type === 'how' && m.steps) {
+      setContent(m.steps[langKey]);
+      setLoading(false);
+      return;
+    }
+
     try {
       if (type === 'why') {
         const why = await geminiService.explainMovement(m.title, m.neuroBenefit, lang);

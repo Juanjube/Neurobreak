@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -26,6 +25,10 @@ export interface Movement {
   recommended?: boolean;
   neuroBenefit: string;
   intensity: 'Low' | 'Medium' | 'High';
+  /** Pasos fijos y revisados (no generados por IA) por idioma. */
+  steps?: { en: string[]; es: string[] };
+  /** Explicación fija del "¿Por qué?" por idioma. */
+  why?: { en: string; es: string };
 }
 
 export type MindGameCategory = 'Memory' | 'Focus' | 'Pattern' | 'Number' | 'Change' | 'Timing' | 'Breathing';
