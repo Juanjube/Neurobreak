@@ -26,3 +26,6 @@ dist-ssr
 .testsprite-plans/
 testsprite-plans/
 
+
+# Electron
+release/
