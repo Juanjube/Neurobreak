@@ -266,7 +266,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               disabled={loading}
               className="w-full bg-white text-[#080B0E] h-12 rounded-xl font-bold transition-all hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="size-5" />
+              <img src="/google-g.svg" alt="Google" className="size-5" />
               {t('continueWithGoogle')}
             </button>
 
@@ -394,7 +394,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           disabled={loading}
           className="w-full bg-white/5 hover:bg-white/10 text-content border border-[#233648] h-11 rounded-xl font-bold transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="size-5" />
+          <img src="/google-g.svg" alt="Google" className="size-5" />
           {t('continueWithGoogle')}
         </button>
 

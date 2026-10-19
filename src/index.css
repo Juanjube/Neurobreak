@@ -1,0 +1,322 @@
+@import '@fontsource-variable/lexend';
+@import '@fontsource-variable/noto-sans';
+@import 'material-symbols/outlined.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #F8F7FC;
+  --color-surface: #FFFFFF;
+  --color-accent: #6247AA;
+  --color-text-main: #1A1625;
+  --color-text-sec: #6C6A75;
+  --color-border: #E5E5EA;
+}
+
+html.dark {
+  --color-bg: #0B0813;
+  --color-surface: #1A1625;
+  --color-accent: #9D4EDD;
+  --color-text-main: #F7F4F9;
+  --color-text-sec: #A0A0B0;
+  --color-border: #324D67;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Animated Moon/Sun Toggle ===== */
+.theme-toggle-checkbox {
+  opacity: 0;
+  height: 0;
+  width: 0;
+  position: absolute;
+}
+
+.theme-toggle-label {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  width: 80px;
+  height: 40px;
+  background: #211042;
+  border-radius: 50px;
+  transition: 500ms;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.theme-toggle-button {
+  position: absolute;
+  display: inline-block;
+  top: 3px;
+  left: 3px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #FAEAF1;
+  overflow: hidden;
+  box-shadow: 0 0 14px 2px rgba(255, 255, 255, 0.8);
+  transition: all 500ms ease-out;
+}
+
+.theme-toggle-crater {
+  position: absolute;
+  display: inline-block;
+  background: #FAEAF1;
+  border-radius: 50%;
+  transition: 500ms;
+}
+
+.theme-crater-1 {
+  background: #FFFFF9;
+  width: 34px;
+  height: 34px;
+  left: 4px;
+  bottom: 4px;
+}
+
+.theme-crater-2 {
+  width: 8px;
+  height: 8px;
+  top: -3px;
+  left: 17px;
+}
+
+.theme-crater-3 {
+  width: 6px;
+  height: 6px;
+  top: 8px;
+  right: -2px;
+}
+
+.theme-crater-4 {
+  width: 4px;
+  height: 4px;
+  top: 10px;
+  left: 12px;
+}
+
+.theme-crater-5 {
+  width: 6px;
+  height: 6px;
+  top: 16px;
+  left: 19px;
+}
+
+.theme-crater-6 {
+  width: 4px;
+  height: 4px;
+  top: 19px;
+  left: 8px;
+}
+
+.theme-crater-7 {
+  width: 5px;
+  height: 5px;
+  bottom: 2px;
+  left: 14px;
+}
+
+.theme-star {
+  position: absolute;
+  display: inline-block;
+  border-radius: 50%;
+  background: #FFF;
+  box-shadow: 1px 0 2px 2px rgba(255, 255, 255, 0.8);
+}
+
+.theme-star-1 {
+  width: 3px;
+  height: 3px;
+  right: 36px;
+  bottom: 16px;
+}
+
+.theme-star-2 {
+  width: 3px;
+  height: 3px;
+  right: 28px;
+  top: 4px;
+}
+
+.theme-star-3 {
+  width: 2px;
+  height: 2px;
+  right: 24px;
+  bottom: 6px;
+}
+
+.theme-star-4 {
+  width: 2px;
+  height: 2px;
+  right: 16px;
+  bottom: 20px;
+}
+
+.theme-star-5 {
+  width: 2px;
+  height: 2px;
+  right: 4px;
+  bottom: 14px;
+}
+
+.theme-star-6,
+.theme-star-7,
+.theme-star-8 {
+  width: 5px;
+  height: 1px;
+  border-radius: 2px;
+  transform: rotate(-45deg);
+  box-shadow: 3px 0px 3px 1px #FFF;
+  animation-name: theme-travel;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.theme-star-6 {
+  right: 12px;
+  bottom: 12px;
+  animation-delay: -2s;
+}
+
+.theme-star-7 {
+  right: 20px;
+  bottom: 24px;
+}
+
+.theme-star-8 {
+  right: 36px;
+  top: 4px;
+  animation-delay: -4s;
+}
+
+@keyframes theme-travel {
+  0%   { transform: rotate(-45deg) translateX(28px); }
+  50%  { transform: rotate(-45deg) translateX(-8px); box-shadow: 3px 0px 4px 1px #FFF; }
+  100% { transform: rotate(-45deg) translateX(-12px); width: 1px; height: 1px; opacity: 0; box-shadow: none; }
+}
+
+/* Checked = Light Mode (sun) */
+.theme-toggle-checkbox:checked + .theme-toggle-label {
+  background: #24D7F7;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-button {
+  background: #F7FFFF;
+  transform: translateX(40px);
+  box-shadow: 0 0 14px 3px rgba(255, 255, 255, 0.9);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-crater {
+  transform: rotate(-45deg) translateX(70px);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star {
+  animation: theme-move 2s infinite;
+  transform: none;
+  box-shadow: none;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-1 {
+  width: 16px;
+  height: 4px;
+  border-radius: 4px;
+  background: #FFF;
+  left: 8px;
+  top: 10px;
+  box-shadow: none;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-2 {
+  width: 5px;
+  height: 5px;
+  background: #FFF;
+  left: 10px;
+  top: 9px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-3 {
+  width: 6px;
+  height: 6px;
+  background: #FFF;
+  left: 14px;
+  top: 7px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-4 {
+  width: 6px;
+  height: 6px;
+  background: #FFF;
+  left: 18px;
+  top: 8px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-5 {
+  width: 24px;
+  height: 6px;
+  border-radius: 6px;
+  background: #FFF;
+  left: 12px;
+  bottom: 8px;
+  box-shadow: none;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-6 {
+  width: 7px;
+  height: 7px;
+  background: #FFF;
+  border-radius: 50%;
+  left: 15px;
+  bottom: 8px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-7 {
+  width: 10px;
+  height: 10px;
+  background: #FFF;
+  border-radius: 50%;
+  left: 21px;
+  bottom: 7px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-star-8 {
+  width: 8px;
+  height: 8px;
+  background: #FFF;
+  border-radius: 50%;
+  left: 28px;
+  top: 24px;
+  box-shadow: -1px 0 2px 0 rgba(0,0,0,0.1);
+}
+
+@keyframes theme-move {
+  0%   { transform: none; }
+  25%  { transform: translateX(1px); }
+  100% { transform: translateX(-1px); }
+}
